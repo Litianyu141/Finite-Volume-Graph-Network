@@ -1,9 +1,0 @@
-﻿  main.cpp
-C:\Users\DOOMDUKE2\source\repos\APEXCFGCOPY-1\source\main.cpp(148,19): warning C4018: “<=”: 有符号/无符号不匹配
-C:\Users\DOOMDUKE2\source\repos\APEXCFGCOPY-1\source\main.cpp(155,20): warning C4018: “<=”: 有符号/无符号不匹配
-C:\Users\DOOMDUKE2\source\repos\APEXCFGCOPY-1\source\main.cpp(194,20): warning C4018: “<”: 有符号/无符号不匹配
-C:\Users\DOOMDUKE2\source\repos\APEXCFGCOPY-1\source\main.cpp(527,15): warning C4018: “<”: 有符号/无符号不匹配
-C:\Users\DOOMDUKE2\source\repos\APEXCFGCOPY-1\source\main.cpp(535,15): warning C4018: “<”: 有符号/无符号不匹配
-C:\Users\DOOMDUKE2\source\repos\APEXCFGCOPY-1\source\main.cpp(569,22): warning C4018: “<”: 有符号/无符号不匹配
-C:\Users\DOOMDUKE2\source\repos\APEXCFGCOPY-1\source\main.cpp(412): warning C4715: “MyFile::CopyFileTo”: 不是所有的控件路径都返回值
-  APEXCFGCOPY-1.vcxproj -> C:\Users\DOOMDUKE2\source\repos\APEXCFGCOPY-1\Debug\APEXCFGCOPY-1.exe

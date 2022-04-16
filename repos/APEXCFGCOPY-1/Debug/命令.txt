@@ -1,1 +1,0 @@
-+fps_max unlimited +exec superglide1 +exec autoexec +gfx_nvnUseLowLatency 1 -dev

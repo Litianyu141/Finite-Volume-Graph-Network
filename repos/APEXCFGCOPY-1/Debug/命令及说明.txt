@@ -1,5 +1,0 @@
-将local和profile文件夹放到C:\Users\DOOMDUKE2\Saved Games\Respawn\Apex路径下覆盖
-将autoexec和superglide1，superglide2，3文件放到游戏目录C:\Program Files (x86)\Origin Games\Apex\cfg这个cfg文件夹内
-
-然后在steam游戏启动项那加入一下命令
-+fps_max 154 +exec superglide1 +exec autoexec +gfx_nvnUseLowLatency 1 -dev
