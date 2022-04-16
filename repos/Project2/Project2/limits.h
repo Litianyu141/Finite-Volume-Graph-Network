@@ -1,0 +1,1 @@
+char* getcwd(char* buffer, int maxlen);

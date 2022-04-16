@@ -1,0 +1,14 @@
+﻿  main.cpp
+C:\Users\DOOMDUKE-980PRO\source\repos\EXE_Excutor\source\main.cpp(145,55): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+C:\Users\DOOMDUKE-980PRO\source\repos\EXE_Excutor\source\main.cpp(172,49): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+C:\Users\DOOMDUKE-980PRO\source\repos\EXE_Excutor\source\main.cpp(183,79): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+C:\Users\DOOMDUKE-980PRO\source\repos\EXE_Excutor\source\main.cpp(184,76): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+C:\Users\DOOMDUKE-980PRO\source\repos\EXE_Excutor\source\main.cpp(209,11): warning C4101: “celtFetched”: 未引用的局部变量
+C:\Users\DOOMDUKE-980PRO\source\repos\EXE_Excutor\source\main.cpp(207,12): warning C4101: “strDispName”: 未引用的局部变量
+C:\Users\DOOMDUKE-980PRO\source\repos\EXE_Excutor\source\main.cpp(306,42): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+  正在生成代码
+  2 of 265 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  EXE_Excutor.vcxproj -> C:\Users\DOOMDUKE-980PRO\source\repos\EXE_Excutor\x64\Release\EXE_Excutor.exe

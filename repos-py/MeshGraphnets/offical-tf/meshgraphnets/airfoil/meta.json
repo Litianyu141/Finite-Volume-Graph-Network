@@ -1,0 +1,70 @@
+{
+  "simulator": "su2",
+  "dt": 0.0002,
+  "collision_radius": null,
+  "features": {
+    "node_type": {
+      "type": "static",
+      "shape": [
+        1,
+        5233,
+        1
+      ],
+      "dtype": "int32"
+    },
+    "cells": {
+      "type": "static",
+      "shape": [
+        1,
+        10216,
+        3
+      ],
+      "dtype": "int32"
+    },
+    "mesh_pos": {
+      "type": "static",
+      "shape": [
+        1,
+        5233,
+        2
+      ],
+      "dtype": "float32"
+    },
+    "density": {
+      "type": "dynamic",
+      "shape": [
+        601,
+        5233,
+        1
+      ],
+      "dtype": "float32"
+    },
+    "pressure": {
+      "type": "dynamic",
+      "shape": [
+        601,
+        5233,
+        1
+      ],
+      "dtype": "float32"
+    },
+    "velocity": {
+      "type": "dynamic",
+      "shape": [
+        601,
+        5233,
+        2
+      ],
+      "dtype": "float32"
+    }
+  },
+  "field_names": [
+    "node_type",
+    "cells",
+    "mesh_pos",
+    "density",
+    "pressure",
+    "velocity"
+  ],
+  "trajectory_length": 601
+}

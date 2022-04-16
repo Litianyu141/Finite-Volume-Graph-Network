@@ -1,0 +1,7 @@
+﻿main.obj : error LNK2019: 无法解析的外部符号 __imp_pthread_once，函数 "char * __cdecl sgetenv(char const *)" (?sgetenv@@YAPEADPEBD@Z) 中引用了该符号
+main.obj : error LNK2019: 无法解析的外部符号 __imp_pthread_key_create，函数 "void __cdecl thread_init(void)" (?thread_init@@YAXXZ) 中引用了该符号
+main.obj : error LNK2019: 无法解析的外部符号 __imp_pthread_setspecific，函数 "char * __cdecl sgetenv(char const *)" (?sgetenv@@YAPEADPEBD@Z) 中引用了该符号
+main.obj : error LNK2019: 无法解析的外部符号 __imp_pthread_getspecific，函数 "char * __cdecl sgetenv(char const *)" (?sgetenv@@YAPEADPEBD@Z) 中引用了该符号
+main.obj : error LNK2019: 无法解析的外部符号 __imp_pthread_mutex_lock，函数 "char * __cdecl sgetenv(char const *)" (?sgetenv@@YAPEADPEBD@Z) 中引用了该符号
+main.obj : error LNK2019: 无法解析的外部符号 __imp_pthread_mutex_unlock，函数 "char * __cdecl sgetenv(char const *)" (?sgetenv@@YAPEADPEBD@Z) 中引用了该符号
+C:\Users\DOOMDUKE2\source\repos\env test\x64\Debug\env test.exe : fatal error LNK1120: 6 个无法解析的外部命令
