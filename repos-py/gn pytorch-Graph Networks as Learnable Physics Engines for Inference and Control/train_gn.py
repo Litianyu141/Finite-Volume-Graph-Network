@@ -30,8 +30,8 @@ if __name__ == "__main__":
 
     G1 = nx.path_graph(6).to_directed()
     G_target = nx.path_graph(6).to_directed()
-    #nx.draw(G1)
-    #plt.show()
+    nx.draw(G1)
+    plt.show()
     node_feat_size = 6
     edge_feat_size = 3
     graph_feat_size = 10

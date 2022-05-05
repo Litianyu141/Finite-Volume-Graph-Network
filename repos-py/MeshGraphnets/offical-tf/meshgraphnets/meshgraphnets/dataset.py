@@ -20,7 +20,7 @@ import functools
 import json
 import os
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from meshgraphnets.common import NodeType
 

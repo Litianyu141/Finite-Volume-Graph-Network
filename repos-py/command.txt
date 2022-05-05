@@ -1,3 +1,4 @@
 git clone git@github.com:fxia22/gn.pytorch.git
+git@github.com:wu375/simple-physics-simulator-pytorch-geometry.git
 git zyy
 git fx

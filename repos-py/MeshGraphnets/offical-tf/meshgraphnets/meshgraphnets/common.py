@@ -17,7 +17,7 @@
 """Commonly used data structures and functions."""
 
 import enum
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 class NodeType(enum.IntEnum):
