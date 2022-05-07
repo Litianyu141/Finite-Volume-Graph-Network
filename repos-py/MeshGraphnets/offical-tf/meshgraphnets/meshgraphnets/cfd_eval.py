@@ -16,7 +16,7 @@
 # ============================================================================
 """Functions to build evaluation metrics for CFD data."""
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from meshgraphnets.common import NodeType
 
