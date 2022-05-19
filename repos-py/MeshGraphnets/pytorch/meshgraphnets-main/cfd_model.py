@@ -80,10 +80,10 @@ class Model(nn.Module):
 
     def select_core_model(self, core_model_name):
         return {
-            'encode_process_decode': encode_process_decode,
-            'encode_process_decode_graph_structure_watcher': encode_process_decode_graph_structure_watcher,
-            'encode_process_decode_max_pooling': encode_process_decode_max_pooling,
-            'encode_process_decode_lstm': encode_process_decode_lstm,
+            'encode_process_decode': encode_process_decode
+            # 'encode_process_decode_graph_structure_watcher': encode_process_decode_graph_structure_watcher,
+            # 'encode_process_decode_max_pooling': encode_process_decode_max_pooling,
+            # 'encode_process_decode_lstm': encode_process_decode_lstm,
         }.get(core_model_name, encode_process_decode)
 
     def _build_graph(self, inputs, is_training):
