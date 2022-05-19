@@ -29,7 +29,11 @@ Download a dataset:
 
 Go to the dataset directory and generate .idx file(needed by package tfrecord for reading .tfrecord file in PyTorch):
 
-    python -m tfrecord.tools.tfrecord2idx <file>.tfrecord <file>.id
+    python -m tfrecord.tools.tfrecord2idx <file>.tfrecord <file>.idx
+    python -m tfrecord.tools.tfrecord2idx test.tfrecord test.idx
+    python -m tfrecord.tools.tfrecord2idx train.tfrecord train.idx
+    python -m tfrecord.tools.tfrecord2idx valid.tfrecord valid.idx
+C:\Users\DOOMDUKE-980PRO\source\repos-py\MeshGraphnets\pytorch\meshgraphnets-main\datasets\airfoil
     
 Configure running goals by setting the variables and flags variables at the beginning of run_model.py, which includes
 running mode (training/evaluation), model, epochs, saving path and etc.
