@@ -16,8 +16,7 @@
 # Usage:
 #     sh download_dataset.sh ${DATASET_NAME} ${OUTPUT_DIR}
 # Example:
-#     sh download_dataset.sh airfoil /tmp/
-#sh download_dataset.sh airfoil C:/Users/DOOMDUKE-980PRO/source/repos-py/MeshGraphnets/pytorch/meshgraphnets-main/datasets
+#     sh download_dataset.sh flag_simple /tmp/
 
 set -e
 

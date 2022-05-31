@@ -1,0 +1,20 @@
+2022-05-26 00:46:27,295 - =========================================================
+2022-05-26 00:46:27,295 - Start new run in C:\Users\DOOMDUKE-980PRO\source\repos-py\MeshGraphnets\my-refactor\output\airfoil\Thu-May-26-00-46-27-2022\1
+2022-05-26 00:46:27,295 - =========================================================
+2022-05-26 00:46:27,296 - Program started at time Thu May 26 00:46:27 2022
+2022-05-26 00:46:27,297 - Start training......
+2022-05-26 00:46:28,811 - 
+2022-05-26 00:46:28,811 - =======================Run Summary=======================
+2022-05-26 00:46:28,811 - Simulation task is cfd simulation
+2022-05-26 00:46:28,811 - Mode is all
+2022-05-26 00:46:28,811 - Evaluation set is valid
+2022-05-26 00:46:28,811 - Train and/or evaluation configuration are 10000000 epochs, 1000 trajectories each epoch, number of rollouts is 10
+2022-05-26 00:46:28,811 - Core model is encode_process_decode
+2022-05-26 00:46:28,811 - Message passing aggregator is sum
+2022-05-26 00:46:28,812 - Message passing steps are 6
+2022-05-26 00:46:28,812 - Attention used is False
+2022-05-26 00:46:28,812 - Ripple used is False
+2022-05-26 00:46:28,812 - Run output directory is C:\Users\DOOMDUKE-980PRO\source\repos-py\MeshGraphnets\my-refactor\output\airfoil\Thu-May-26-00-46-27-2022\1
+2022-05-26 00:46:28,812 - =========================================================
+2022-05-26 00:46:28,812 - 
+2022-05-26 00:46:28,814 - Epoch 1/10000000

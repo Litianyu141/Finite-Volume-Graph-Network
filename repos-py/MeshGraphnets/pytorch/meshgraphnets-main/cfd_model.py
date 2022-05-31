@@ -25,7 +25,7 @@ import torch.nn.functional as F
 import encode_process_decode
 
 device = torch.device('cuda')
-is_training = True
+
 
 class Model(nn.Module):
     """Model for fluid simulation."""
@@ -80,13 +80,13 @@ class Model(nn.Module):
 
     def select_core_model(self, core_model_name):
         return {
-            'encode_process_decode': encode_process_decode
-            # 'encode_process_decode_graph_structure_watcher': encode_process_decode_graph_structure_watcher,
-            # 'encode_process_decode_max_pooling': encode_process_decode_max_pooling,
-            # 'encode_process_decode_lstm': encode_process_decode_lstm,
+            'encode_process_decode': encode_process_decode,
+            'encode_process_decode_graph_structure_watcher': encode_process_decode_graph_structure_watcher,
+            'encode_process_decode_max_pooling': encode_process_decode_max_pooling,
+            'encode_process_decode_lstm': encode_process_decode_lstm,
         }.get(core_model_name, encode_process_decode)
 
-    def _build_graph(self, inputs, is_training_p):
+    def _build_graph(self, inputs, is_training):
         """Builds input graph."""
         node_type = inputs['node_type']
         velocity = inputs['velocity']
@@ -119,12 +119,12 @@ class Model(nn.Module):
             return self.core_model.MultiGraph(node_features=self._node_normalizer(node_features, is_training),
                                               edge_sets=[mesh_edges])
 
-    def forward(self, inputs, is_training_p):
-        graph = self._build_graph(inputs,False)
-        if is_training_p:
-            return self.learned_model(graph, self._edge_normalizer,is_training)
+    def forward(self, inputs, is_training):
+        graph = self._build_graph(inputs, is_training=is_training)
+        if is_training:
+            return self.learned_model(graph, self._edge_normalizer, is_training=is_training)
         else:
-            return self._update(inputs, self.learned_model(graph, self._edge_normalizer,is_training))
+            return self._update(inputs, self.learned_model(graph, self._edge_normalizer, is_training=is_training))
 
     def _update(self, inputs, per_node_network_output):
         """Integrate model outputs."""

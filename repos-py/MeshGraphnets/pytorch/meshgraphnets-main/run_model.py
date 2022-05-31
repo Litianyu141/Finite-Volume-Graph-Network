@@ -58,15 +58,15 @@ device = torch.device('cuda')
 
 # train and evaluation configuration
 FLAGS = flags.FLAGS
-flags.DEFINE_enum('model', 'cfd', ['cloth', 'deform', 'cfd'],
+flags.DEFINE_enum('model', 'deform', ['cloth', 'deform'],
                   'Select model to run.')
 flags.DEFINE_enum('mode', 'all', ['train', 'eval', 'all'],
                   'Train model, or run evaluation, or run both.')
 flags.DEFINE_enum('rollout_split', 'valid', ['train', 'test', 'valid'],
                   'Dataset split to use for rollouts.')
-flags.DEFINE_string('dataset', 'airfoil', ['flag_simple', 'deforming_plate', 'airfoil'])
+flags.DEFINE_string('dataset', 'deforming_plate', ['flag_simple', 'deforming_plate'])
 
-flags.DEFINE_integer('epochs', int(10e6), 'No. of training epochs')
+flags.DEFINE_integer('epochs', 2, 'No. of training epochs')
 flags.DEFINE_integer('trajectories', 2, 'No. of training trajectories')
 flags.DEFINE_integer('num_rollouts', 1, 'No. of rollout trajectories')
 
@@ -75,7 +75,7 @@ flags.DEFINE_enum('core_model', 'encode_process_decode',
                   ['encode_process_decode'],
                   'Core model to be used')
 flags.DEFINE_enum('message_passing_aggregator', 'sum', ['sum', 'max', 'min', 'mean', 'pna'], 'No. of training epochs')
-flags.DEFINE_integer('message_passing_steps', 6, 'No. of training epochs')
+flags.DEFINE_integer('message_passing_steps', 5, 'No. of training epochs')
 flags.DEFINE_boolean('attention', False, 'whether attention is used or not')
 
 # ripple method configuration
@@ -86,7 +86,7 @@ ripple_generation defines how the ripples are generated:
     equal_size: all ripples have almost equal size of nodes
     gradient: ripples are generated according to node feature similarity
     exponential_size: ripples have a size that grows exponentially
-
+    
 ripple_node_selection defines how the nodes are selected from each ripple:
     random: a specific number of nodes are selected randomly from each ripple
     all: all nodes of the ripple are selected
@@ -98,8 +98,7 @@ ripple_node_connection defines how the selected nodes of each ripple connect wit
     fully_ncross_connected: a specific number of nodes of the same ripple are connected with each other, and n randomly selected nodes from them will connect with n randomly selected nodes from another ripple
 '''
 flags.DEFINE_boolean('ripple_used', False, 'whether ripple is used or not')
-flags.DEFINE_enum('ripple_generation', 'distance_density',
-                  ['equal_size', 'gradient', 'exponential_size', 'random_nodes', 'distance_density'],
+flags.DEFINE_enum('ripple_generation', 'distance_density', ['equal_size', 'gradient', 'exponential_size', 'random_nodes', 'distance_density'],
                   'defines how ripples are generated')
 flags.DEFINE_integer('ripple_generation_number', 5,
                      'defines how many ripples should be generated in equal size and gradient ripple generation; or the base in exponential size generation')
@@ -118,11 +117,10 @@ flags.DEFINE_string('model_last_run_dir',
                     None,
                     # os.path.join('E:\\meshgraphnets\\output\\deforming_plate', 'Sat-Feb-12-12-14-04-2022'),
                     # os.path.join('/home/i53/student/ruoheng_ma/meshgraphnets/output/deforming_plate', 'Mon-Jan--3-15-18-53-2022'),
-                    # os.path.join('/root/meshgraphnets/chk/airfoil', 'Mon-Jan--3-15-18-53-2022'),
                     'Path to the checkpoint file of a network that should continue training')
 
 # decide whether to use the configuration from last run step
-flags.DEFINE_boolean('use_prev_config', False, 'Decide whether to use the configuration from last run step')
+flags.DEFINE_boolean('use_prev_config', True, 'Decide whether to use the configuration from last run step')
 
 # hpc max run time setting
 flags.DEFINE_integer('hpc_default_max_time', (48 - 4) * 60 * 60, 'Max run time on hpc')
@@ -136,8 +134,8 @@ PARAMETERS = {
                   size=3, batch=1, model=cloth_model, evaluator=cloth_eval, loss_type='cloth',
                   stochastic_message_passing_used='False'),
     'deform': dict(noise=0.003, gamma=1.0, field='world_pos', history=False,
-                   size=3, batch=2, model=deform_model, evaluator=deform_eval, loss_type='deform',
-                   stochastic_message_passing_used='False')
+                  size=3, batch=2, model=deform_model, evaluator=deform_eval, loss_type='deform',
+                  stochastic_message_passing_used='False')
 }
 
 loaded_meta = False
@@ -188,14 +186,6 @@ def add_targets(params):
                         out['prev|' + key] = val[0:-2]
                     out['target|' + key] = val[2:]
             return out
-        elif loss_type == 'cfd':
-            out = {}
-            for key, val in trajectory.items():
-                out[key] = val[0:-1]
-                if key in fields:
-                    out['target|' + key] = val[1:]
-            return out
-
     return fn
 
 
@@ -251,8 +241,6 @@ def process_trajectory(trajectory_data, params, model_type, dataset_dir, add_tar
                 steps = meta['trajectory_length'] - 2
             elif params['loss_type'] == 'deform':
                 steps = meta['trajectory_length'] - 1
-            elif params['loss_type'] == 'cfd':  # edited by lty
-                steps = meta['trajectory_length'] - 1
             for key, field in meta['features'].items():
                 shapes[key] = field['shape']
                 dtypes[key] = field['dtype']
@@ -274,15 +262,12 @@ def process_trajectory(trajectory_data, params, model_type, dataset_dir, add_tar
         elif types[key] != 'dynamic':
             raise ValueError('invalid data format')
         trajectory[key] = reshaped_data
-        if not trajectory:
-            print("trajectory is empty")
 
     if add_targets_bool:
         trajectory = add_targets(params)(trajectory)
     if split_and_preprocess_bool:
         trajectory = split_and_preprocess(params, model_type)(trajectory)
     return trajectory
-
 
 def pickle_save(path, data):
     with open(path, 'wb') as f:
@@ -450,20 +435,6 @@ def loss_fn(loss_type, inputs, network_output, model, params):
         error = torch.sum((target_normalized - network_output) ** 2, dim=1)
         loss = torch.mean(error[loss_mask])
         return loss
-    elif loss_type == 'cfd':
-        # build target velocity change
-        cur_velocity = inputs['velocity']
-        target_velocity = inputs['target|velocity']
-
-        target_velocity_change = target_velocity - cur_velocity
-        target_normalized = model.get_output_normalizer()(target_velocity_change).to(device)
-
-        # build loss
-        node_type = inputs['node_type']
-        loss_mask = torch.eq(node_type[:, 0], torch.tensor([common.NodeType.NORMAL.value], device=device).int())
-        error = torch.sum((target_normalized - network_output) ** 2, dim=1)
-        loss = torch.mean(error[loss_mask])
-        return loss
     elif loss_type == 'deform':
         world_pos = inputs['world_pos']
         target_world_pos = inputs['target|world_pos']
@@ -503,7 +474,6 @@ def loss_fn(loss_type, inputs, network_output, model, params):
         # error += torch.sum((target_normalized_stress - network_output) ** 2, dim=1)
         # loss = torch.mean(error)
         return loss
-
 
 def evaluator(params, model, run_step_config):
     root_logger = logging.getLogger()
@@ -554,7 +524,6 @@ def evaluator(params, model, run_step_config):
     loss_record['eval_l1_losses'] = l1_losses
     return loss_record
 
-
 def n_step_evaluator(params, model, run_step_config, n_step_list, n_traj=1):
     model_type = run_step_config['model']
 
@@ -579,20 +548,14 @@ def n_step_evaluator(params, model, run_step_config, n_step_list, n_traj=1):
                 mse_loss_fn = torch.nn.MSELoss()
                 l1_loss_fn = torch.nn.L1Loss()
                 if model_type == 'cloth':
-                    mse_loss = mse_loss_fn(torch.squeeze(eval_traj['world_pos'], dim=0),
-                                           prediction_trajectory['pred_pos'])
-                    l1_loss = l1_loss_fn(torch.squeeze(eval_traj['world_pos'], dim=0),
-                                         prediction_trajectory['pred_pos'])
+                    mse_loss = mse_loss_fn(torch.squeeze(eval_traj['world_pos'], dim=0), prediction_trajectory['pred_pos'])
+                    l1_loss = l1_loss_fn(torch.squeeze(eval_traj['world_pos'], dim=0), prediction_trajectory['pred_pos'])
                 elif model_type == 'cfd':
-                    mse_loss = mse_loss_fn(torch.squeeze(eval_traj['velocity'], dim=0),
-                                           prediction_trajectory['pred_velocity'])
-                    l1_loss = l1_loss_fn(torch.squeeze(eval_traj['velocity'], dim=0),
-                                         prediction_trajectory['pred_velocity'])
+                    mse_loss = mse_loss_fn(torch.squeeze(eval_traj['velocity'], dim=0), prediction_trajectory['pred_velocity'])
+                    l1_loss = l1_loss_fn(torch.squeeze(eval_traj['velocity'], dim=0), prediction_trajectory['pred_velocity'])
                 elif model_type == 'deform':
-                    mse_loss = mse_loss_fn(torch.squeeze(eval_traj['world_pos'], dim=0),
-                                           prediction_trajectory['pred_pos'])
-                    l1_loss = l1_loss_fn(torch.squeeze(eval_traj['world_pos'], dim=0),
-                                         prediction_trajectory['pred_pos'])
+                    mse_loss = mse_loss_fn(torch.squeeze(eval_traj['world_pos'], dim=0), prediction_trajectory['pred_pos'])
+                    l1_loss = l1_loss_fn(torch.squeeze(eval_traj['world_pos'], dim=0), prediction_trajectory['pred_pos'])
                 mse_losses.append(mse_loss.cpu())
                 l1_losses.append(l1_loss.cpu())
             if n_step not in n_step_mse_losses and n_step not in n_step_l1_losses:
@@ -726,8 +689,7 @@ def main(argv):
     # setup directory structure for saving checkpoint, train configuration, rollout result and log
     root_dir = pathlib.Path(__file__).parent.resolve()
     # dataset_dir = os.path.join('/home/temp_store/ruoheng_ma', 'data', dataset_name)
-    # dataset_dir = os.path.join('data', dataset_name)
-    dataset_dir = os.path.join('C:/Users/DOOMDUKE-980PRO/source/repos-py/MeshGraphnets/pytorch/meshgraphnets-main', 'datasets', dataset_name)
+    dataset_dir = os.path.join('data', dataset_name)
     output_dir = os.path.join(root_dir, 'output', dataset_name)
     run_step_dir = prepare_files_and_directories(last_run_dir, output_dir)
     checkpoint_dir = os.path.join(run_step_dir, 'checkpoint')
