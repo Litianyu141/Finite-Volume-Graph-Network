@@ -9,3 +9,8 @@ output
 .idea
 .ipynb_checkpoints
 __pycache__
+/repos-py/MeshGraphnets/pytorch/meshgraphnets-main/venv
+/repos-py/MeshGraphnets/pytorch/meshgraphnets-main/.idea
+/repos-py/MeshGraphnets/pytorch/meshgraphnets-main/.vscode
+/repos-py/MeshGraphnets/pytorch/meshgraphnets-main/__pycache__
+/repos-py/MeshGraphnets/pytorch/meshgraphnets-main/output
