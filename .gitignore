@@ -4,3 +4,8 @@ rollout
 /repos/无重复字符的最长子串/lc 4.28/lc 4.28.vcxproj.filters
 /repos/无重复字符的最长子串/lc 4.28/lc 4.28.vcxproj.user
 /repos/无重复字符的最长子串/lc 4.28/Debug
+/repos-py/MeshGraphnets/my-refactor/.ipynb_checkpoints
+output
+.idea
+.ipynb_checkpoints
+__pycache__
