@@ -1,4 +1,3 @@
-#2 -*- encoding: utf-8 -*-
 '''
 @File    :   parse_tfrecord.py
 @Author  :   litianyu 

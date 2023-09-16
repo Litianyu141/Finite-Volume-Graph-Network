@@ -1,3 +1,9 @@
+'''
+@File    :   parse_tfrecord.py
+@Author  :   litianyu 
+@Version :   1.0
+@Contact :   lty1040808318@163.com
+'''
 import os
 import sys
 sys.path.insert(0, os.path.split(os.path.abspath(__file__))[0])
