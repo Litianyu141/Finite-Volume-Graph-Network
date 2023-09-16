@@ -1,7 +1,0 @@
-﻿  main.cpp
-C:\Users\DOOMDUKE2\source\repos\env test\packages\pthreads.2.9.1.4\build\native\include\pthread.h(35,1): warning C4005: “HAVE_STRUCT_TIMESPEC”: 宏重定义
-C:\Users\DOOMDUKE2\source\repos\env test\env test\main.cpp : message : 参见“HAVE_STRUCT_TIMESPEC”的前一个定义
-C:\Users\DOOMDUKE2\source\repos\env test\env test\main.cpp(10,22): warning C4273: “__p__environ”: dll 链接不一致
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt\stdlib.h(1158,29): message : 参见“__p__environ”的前一个定义
-C:\Users\DOOMDUKE2\source\repos\env test\env test\main.cpp(59,9): warning C4477: “printf”: 格式字符串“%d”需要类型“int”的参数，但可变参数 1 拥有了类型“char *”
-C:\Users\DOOMDUKE2\source\repos\env test\env test\main.cpp(22): error C4700: 使用了未初始化的局部变量“x”

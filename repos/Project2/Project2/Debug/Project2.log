@@ -1,7 +1,0 @@
-﻿  test.cpp
-C:\Users\DOOMDUKE2\source\repos\Project2\Project2\test.cpp(11,9): warning C4477: “printf”: 格式字符串“%s”需要类型“char *”的参数，但可变参数 1 拥有了类型“TCHAR *”
-C:\Users\DOOMDUKE2\source\repos\Project2\Project2\test.cpp(11,9): message : 请考虑在格式字符串中使用“%ls”
-C:\Users\DOOMDUKE2\source\repos\Project2\Project2\test.cpp(11,9): message : 请考虑在格式字符串中使用“%lls”
-C:\Users\DOOMDUKE2\source\repos\Project2\Project2\test.cpp(11,9): message : 请考虑在格式字符串中使用“%Ls”
-C:\Users\DOOMDUKE2\source\repos\Project2\Project2\test.cpp(11,9): message : 请考虑在格式字符串中使用“%ws”
-  Project2.vcxproj -> C:\Users\DOOMDUKE2\source\repos\Project2\Debug\Project2.exe

@@ -1,8 +1,0 @@
-git clone git@github.com:fxia22/gn.pytorch.git
-git@github.com:wu375/simple-physics-simulator-pytorch-geometry.git
-git zyy
-git fx
-
-python plot_cloth.py --rollout_path=C:/Users/DOOMDUKE2/source/repos-py/MeshGraphnets/offical-tf/meshgraphnets/rollout/flag_simple/rollout1.pkl
-
-python plot_cfd.py --rollout_path=C:/Users/DOOMDUKE2/source/repos-py/MeshGraphnets/offical-tf/meshgraphnets/rollout/cylinder_flow/rollout.pkl
