@@ -21,7 +21,7 @@ from absl import app
 from absl import flags
 from absl import logging
 import numpy as np
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 from meshgraphnets import cfd_eval
 from meshgraphnets import cfd_model
 from meshgraphnets import cloth_eval
@@ -35,9 +35,9 @@ flags.DEFINE_enum('mode', 'train', ['train', 'eval'],
                   'Train model, or run evaluation.')
 flags.DEFINE_enum('model', None, ['cfd', 'cloth'],
                   'Select model to run.')
-flags.DEFINE_string('checkpoint_dir', None, 'Directory to save checkpoint')
-flags.DEFINE_string('dataset_dir', None, 'Directory to load dataset from.')
-flags.DEFINE_string('rollout_path', None,
+flags.DEFINE_string('checkpoint_dir', '/home/litianyu/mycode/repos-py/MeshGraphnets/offical-tf/meshgraphnets/chk/airfoil', 'Directory to save checkpoint')
+flags.DEFINE_string('dataset_dir', '/home/litianyu/mycode/repos-py/MeshGraphnets/pytorch/meshgraphnets-main/datasets/airfoil', 'Directory to load dataset from.')
+flags.DEFINE_string('rollout_path', '/home/litianyu/mycode/repos-py/MeshGraphnets/offical-tf/meshgraphnets/rollout/airfoil',
                     'Pickle file to save eval trajectories')
 flags.DEFINE_enum('rollout_split', 'valid', ['train', 'test', 'valid'],
                   'Dataset split to use for rollouts.')

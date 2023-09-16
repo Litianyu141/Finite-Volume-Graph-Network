@@ -17,12 +17,14 @@
 """Model for CylinderFlow."""
 
 import sonnet as snt
-import tensorflow.compat.v1 as tf
-
+import tensorflow as tf
+import os
 from meshgraphnets import common
 from meshgraphnets import core_model
 from meshgraphnets import normalization
 
+os.environ['CUDA_VISIVLE_DEVICES']='1'
+tf.device('gpu/1')
 
 class Model(snt.AbstractModule):
   """Model for fluid simulation."""

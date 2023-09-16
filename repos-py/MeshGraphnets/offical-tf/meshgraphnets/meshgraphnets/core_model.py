@@ -19,7 +19,7 @@
 import collections
 import functools
 import sonnet as snt
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 EdgeSet = collections.namedtuple('EdgeSet', ['name', 'features', 'senders',
                                              'receivers'])

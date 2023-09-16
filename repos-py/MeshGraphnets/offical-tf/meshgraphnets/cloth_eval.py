@@ -16,7 +16,7 @@
 # ============================================================================
 """Functions to build evaluation metrics for cloth data."""
 
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 from meshgraphnets.common import NodeType
 

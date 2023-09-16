@@ -16,7 +16,7 @@
 # Usage:
 #     sh download_dataset.sh ${DATASET_NAME} ${OUTPUT_DIR}
 # Example:
-#     sh download_dataset.sh flag_simple /tmp/
+#     sh download_dataset.sh cylinder_flow /home/litianyu/dataset
 
 set -e
 

@@ -17,7 +17,7 @@
 """Online data normalization."""
 
 import sonnet as snt
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 
 class Normalizer(snt.AbstractModule):

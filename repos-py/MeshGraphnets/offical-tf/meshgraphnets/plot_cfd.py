@@ -27,13 +27,13 @@ import matplotlib.pyplot as plt
 import json
 
 FLAGS = flags.FLAGS
-flags.DEFINE_string('rollout_path', None, 'Path to rollout pickle file')
+flags.DEFINE_string('rollout_path', '/home/litianyu/mycode/repos-py/MeshGraphnets/offical-tf/meshgraphnets/rollout/cylinder_flow/rollout.pkl', 'Path to rollout pickle file')
 
 
 def main(unused_argv):
-  with open("rolloutpath.json",encoding = "utf-8") as f:
-    file = json.load(f)
-    fpath = file["rollout_path"]
+  # with open(FLAGS.rollout_path,encoding = "utf-8") as f:
+  #   file = json.load(f)
+  #   fpath = file["rollout_path"]
   with open(FLAGS.rollout_path, 'rb') as fp:
     rollout_data = pickle.load(fp)
 

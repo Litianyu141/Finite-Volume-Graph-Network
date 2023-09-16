@@ -16,7 +16,7 @@
 # ============================================================================
 """Functions to build evaluation metrics for CFD data."""
 
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 from meshgraphnets.common import NodeType
 
@@ -50,9 +50,10 @@ def evaluate(model, inputs):
   num_steps = inputs['cells'].shape[0]
   prediction = _rollout(model, initial_state, num_steps)
 
-  error = tf.reduce_mean((prediction - inputs['velocity'])**2, axis=-1)
+  error = tf.sum((prediction - inputs['velocity'])**2)
+  RMSE = error/(tf.sum(inputs**2))
   scalars = {'mse_%d_steps' % horizon: tf.reduce_mean(error[1:horizon+1])
-             for horizon in [1, 10, 20, 50, 100, 200]}
+             for horizon in [1, 10, 20, 50, 100, 200,400,500,599]}
   traj_ops = {
       'faces': inputs['cells'],
       'mesh_pos': inputs['mesh_pos'],

@@ -19,7 +19,10 @@
 import collections
 import functools
 import sonnet as snt
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
+import os
+os.environ['CUDA_VISIVLE_DEVICES']='1'
+tf.device('gpu/1')
 
 EdgeSet = collections.namedtuple('EdgeSet', ['name', 'features', 'senders',
                                              'receivers'])

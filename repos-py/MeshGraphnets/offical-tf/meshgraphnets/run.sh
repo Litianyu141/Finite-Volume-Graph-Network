@@ -38,7 +38,7 @@ python -m meshgraphnets.run_model --model=cloth --mode=train --checkpoint_dir=${
 # Generate a rollout trajectory
 ROLLOUT_PATH="${TMP_DIR}/rollout.pkl"
 python -m meshgraphnets.run_model --model=cloth --mode=eval --checkpoint_dir=${CHK_DIR} --dataset_dir=${DATA_DIR} --rollout_path=${ROLLOUT_PATH} --num_rollouts=1
-
+python run_model.py --model=cfd --mode=eval --checkpoint_dir=/home/litianyu/mycode/repos-py/MeshGraphnets/offical-tf/meshgraphnets/chk/cylinder_flow --dataset_dir=/data/litianyu/dataset/MeshGN/cylinder_flow/origin_dataset --rollout_path=/home/litianyu/mycode/repos-py/MeshGraphnets/offical-tf/meshgraphnets/rollout/cylinder_flow --num_rollouts=1
 # Plot the rollout trajectory
 python -m meshgraphnets.plot_cloth --rollout_path=${ROLLOUT_PATH}
 

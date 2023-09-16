@@ -20,10 +20,12 @@ import functools
 import json
 import os
 
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 from meshgraphnets.common import NodeType
 
+os.environ['CUDA_VISIVLE_DEVICES']='1'
+tf.device('gpu/1')
 
 def _parse(proto, meta):
   """Parses a trajectory from tf.Example."""
