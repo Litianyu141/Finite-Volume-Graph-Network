@@ -1,0 +1,14 @@
+# python==3.6
+# nvidia-pyindex
+# nvidia-tensorflow
+dm-sonnet<2
+matplotlib
+absl-py
+numpy
+circle_fit
+scipy
+h5py
+tfrecord
+statsmodels
+natsort
+GitPython

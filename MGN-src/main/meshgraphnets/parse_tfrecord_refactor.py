@@ -1,3 +1,4 @@
+#2 -*- encoding: utf-8 -*-
 '''
 @File    :   parse_tfrecord.py
 @Author  :   litianyu 
@@ -20,8 +21,6 @@ sys.path.insert(0, os.path.split(os.path.abspath(__file__))[0])
 import torch
 
 import matplotlib.pyplot as plt
-from torch_geometric.data import Data
-import torch_geometric.transforms as T
 from write_tec_plot_boundary import write_tecplot_ascii_nodal
 from matplotlib import tri as mtri
 import matplotlib.pyplot as plt
@@ -90,7 +89,7 @@ if case==0:
         'tec_save_path':'/data/litianyu/dataset/MeshGN/cylinder_flow/meshs/',
         'saving_tec':False,
         'stastic':True,
-        'saving_mesh':True,
+        'saving_origin':True,
         'mask_features':True,
         'saving_sp_tf':True,
         'saving_sp_tf_single':False,
@@ -110,7 +109,7 @@ elif case==1:
         'tec_save_path':'/data/litianyu/dataset/MeshGN/cylinder_flow/meshs/',
         'saving_tec':False,
         'stastic':True,
-        'saving_mesh':True,
+        'saving_origin':True,
         'mask_features':True,
         'saving_sp_tf':True,
         'saving_sp_tf_single':False,
@@ -130,7 +129,7 @@ elif case==2:
         'tec_save_path':'/data/litianyu/dataset/MeshGN/cylinder_flow/meshs/',
         'saving_tec':False,
         'stastic':True,
-        'saving_mesh':True,
+        'saving_origin':True,
         'mask_features':False,
         'saving_sp_tf':True,
         'saving_sp_tf_single':False,
@@ -153,7 +152,7 @@ elif case==3:
         'renum_origin_dataset':False,
         'saving_tec':False,
         'stastic':False,
-        'saving_mesh':True,
+        'saving_origin':True,
         'mask_features':False,
         'saving_sp_tf':False,
         'saving_sp_tf_single':False,
@@ -174,7 +173,7 @@ elif case==4:
         'tec_save_path':'/data/litianyu/dataset/MeshGN/cylinder_flow/meshs/',
         'saving_tec':False,
         'stastic':True,
-        'saving_mesh':True,
+        'saving_origin':True,
         'mask_features':True,
         'saving_sp_tf':True,
         'saving_sp_tf_single':False,
@@ -390,7 +389,6 @@ def serialize_example(record,mode='airfoil'):
         "neighbour_cell": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['neighbour_cell'].tobytes()])),
         "cells_face": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['cells_face'].tobytes()])),
         "cells_type": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['cells_type'].tobytes()])),
-        "reinforced_boundary_cells_type": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['reinforced_boundary_cells_type'].tobytes()])),
         "cells_area": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['cells_area'].tobytes()])),
         "unit_norm_v": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['unit_norm_v'].tobytes()])),
         "target|velocity_on_node": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['target|velocity_on_node'].tobytes()])),
@@ -411,7 +409,6 @@ def serialize_example(record,mode='airfoil'):
         "neighbour_cell": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['neighbour_cell'].tobytes()])),
         "cells_face": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['cells_face'].tobytes()])),
         "cells_type": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['cells_type'].tobytes()])),
-        "reinforced_boundary_cells_type": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['reinforced_boundary_cells_type'].tobytes()])),
         "cells_area": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['cells_area'].tobytes()])),
         "unit_norm_v": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['unit_norm_v'].tobytes()])),
         "target|velocity_on_node": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['target|velocity_on_node'].tobytes()])),
@@ -465,29 +462,16 @@ def extract_mesh_state(dataset,writer,index,origin_writer=None,mode='cylinder_me
   OUTFLOW=0
   OBSTACLE = 0
   NORMAL=0
-  '''cell,node,centroid,plot_order'''
-  dataset,rtvalue_renum = renum_data(dataset=dataset,unorder=False,index=0,plot=None)
-  #import plot_tfrecord as pltf
-  #pltf.plot_tfrecord_tmp(dataset)
-  if not rtvalue_renum:
-    return False
+
   mesh = {}
   mesh['mesh_pos'] = dataset['mesh_pos'][0]
   mesh['cells_node'] = np.sort(dataset['cells'][0] , axis=1)
   cells_node = torch.from_numpy(mesh['cells_node']).to(torch.int32)
   mesh['cells_node'] = np.expand_dims(cells_node,axis = 0)
+  mesh_pos = mesh['mesh_pos']
   
-  # computer centriod crds
-  # mesh['centroid'] = np.zeros((cells_node.shape[0],2),dtype = np.float32)
-  # for index_c in range(cells_node.shape[0]):
-  #         cell = cells_node[index_c]
-  #         centroid_x = 0.0
-  #         centroid_y = 0.0
-  #         for j in range(3):
-  #             centroid_x += mesh['mesh_pos'][cell[j]][0]
-  #             centroid_y += mesh['mesh_pos'][cell[j]][1]
-  #         mesh['centroid'][index_c] = np.array([centroid_x/3,centroid_y/3],dtype=np.float32)
-  # mesh['centroid'] = np.expand_dims(mesh['centroid'],axis = 0)
+  dataset['centroid'] = np.expand_dims((mesh_pos[mesh['cells_node'][0,:,0]]+mesh_pos[mesh['cells_node'][0,:,1]]+mesh_pos[mesh['cells_node'][0,:,2]])/3.,axis=0)
+  
   mesh['centroid'] = dataset['centroid']
   
   # compose face        
@@ -499,9 +483,7 @@ def extract_mesh_state(dataset,writer,index,origin_writer=None,mode='cylinder_me
   mesh['face'] = face.T.numpy().astype(np.int32)   
   
   # compute face length
-  g_tmp = Data(pos=torch.from_numpy(mesh['mesh_pos']),edge_index = torch.from_numpy(mesh['face']).to(torch.long))    
-  g_with_ED_dist = transformer(g_tmp)
-  mesh['face_length'] = g_with_ED_dist.edge_attr.to(torch.float32).numpy()
+  mesh['face_length'] = torch.norm(torch.from_numpy(mesh_pos)[senders] - torch.from_numpy(mesh_pos)[receivers], dim=-1,keepdim=True).to(torch.float32).numpy()
   
   # check-out face_type
   face_type = np.zeros((mesh['face'].shape[1],1),dtype=np.int32)
@@ -509,18 +491,6 @@ def extract_mesh_state(dataset,writer,index,origin_writer=None,mode='cylinder_me
   b = torch.index_select(torch.from_numpy(dataset['node_type'][0]),0,torch.from_numpy(mesh['face'][1])).numpy()
   face_center_pos = (torch.index_select(torch.from_numpy(mesh['mesh_pos']),0,torch.from_numpy(mesh['face'][0])).numpy()+torch.index_select(torch.from_numpy(mesh['mesh_pos']),0,torch.from_numpy(mesh['face'][1])).numpy())/2.
   
-  # mesh_pos = dataset['mesh_pos'][0]
-  # node_type = dataset['node_type'][0].reshape(-1)
-  # fig, ax = plt.subplots(1, 1, figsize=(12, 8))
-  # ax.cla()
-  # ax.set_aspect('equal')
-  # #triang = mtri.Triangulation(display_pos[:, 0], display_pos[:, 1])
-  # #ax.tripcolor(triang, mesh['velocity'][i][:, 0], vmin=bb_min[0], vmax=bb_max[0])
-  # #ax.triplot(triang, 'ko-', ms=0.5, lw=0.3)
-  # plt.scatter(mesh_pos[node_type==NodeType.NORMAL,0],mesh_pos[node_type==NodeType.NORMAL,1],c='red',linewidths=1)
-  # plt.scatter(mesh_pos[node_type==NodeType.AIRFOIL,0],mesh_pos[node_type==NodeType.AIRFOIL,1],c='green',linewidths=1)
-  # plt.scatter(mesh_pos[node_type==NodeType.INFLOW,0],mesh_pos[node_type==NodeType.INFLOW,1],c='blue',linewidths=1)
-  # plt.show()
   if mode.find('airfoil')!=-1:
     face_type = torch.from_numpy(face_type)
     Airfoil = torch.full(face_type.shape,NodeType.AIRFOIL).to(torch.int32)
@@ -622,34 +592,9 @@ def extract_mesh_state(dataset,writer,index,origin_writer=None,mode='cylinder_me
   # plt.scatter(mesh_pos[node_type==NodeType.INFLOW,0],mesh_pos[node_type==NodeType.INFLOW,1],c='blue',linewidths=1)
   # plt.show()
   
-  # reinforce boundary cells
-  cells_face = torch.from_numpy(edges_of_cell)
-  cells_face_keys = torch.from_numpy(np.linspace(0,cells_face.shape[0]-1,cells_face.shape[0])).to(torch.long)
-
-  mask_cells_type = torch.from_numpy(cells_type).view(-1)
-  
-  boundary_cell_faces = cells_face[mask_cells_type==NodeType.WALL_BOUNDARY,:]
-  reinforce_boundary_cells_face_keys = cells_face_keys[mask_cells_type==NodeType.WALL_BOUNDARY]
-  
-  for reinforcement_round in range(3):
-    boundary_cell_faces = torch.index_select(cells_face,0,reinforce_boundary_cells_face_keys)
-    flatten_faces = torch.unique(boundary_cell_faces.view(-1))
-    for i in range(edges_of_cell.shape[0]):
-      current_cell_threefaces = cells_face[i]
-      for j in range(3):
-        current_face = current_cell_threefaces[j]
-        if (current_face in flatten_faces) and (i not in reinforce_boundary_cells_face_keys):
-          reinforce_boundary_cells_face_keys = torch.cat((reinforce_boundary_cells_face_keys,torch.tensor([i])),dim=0)
-          
-  reinforced_boundary_cells_type = mask_cells_type.clone()
-  reinforced_boundary_cells_type[reinforce_boundary_cells_face_keys] = NodeType.REINFORCED_BOUNDARY
-  mesh['reinforced_boundary_cells_type'] = np.expand_dims(reinforced_boundary_cells_type.numpy(),axis=1)
-  
   # unit normal vector
-  # unv = torch.ones((mesh['face'].shape[1],2),dtype=torch.float32)
   pos_diff = torch.index_select(torch.from_numpy(mesh['mesh_pos']),0,senders)-torch.index_select(torch.from_numpy(mesh['mesh_pos']),0,receivers)
   unv = torch.cat((-pos_diff[:,1:2],pos_diff[:,0:1]),dim=1)
-  # unv[:,1] = -(pos_diff[:,0]/pos_diff[:,1])
   for i in range(unv.shape[0]):
     if torch.isinf(unv[i][1]):
       unv[i] = torch.tensor([0,1],dtype=torch.float32)
@@ -743,33 +688,17 @@ def extract_mesh_state(dataset,writer,index,origin_writer=None,mode='cylinder_me
   mesh['cells_area'] = cells_area.numpy()
   
   #edge attr
-  #face_attr = mask_face_bonudary(mesh['face_type'],mesh['face'],dataset['velocity'],dataset['pressure'])
   mesh['node_type'] = np.expand_dims(dataset['node_type'][0],axis=0)
-  #mesh['face_flux_BIC'] = face_attr
   mesh['mesh_pos'] = np.expand_dims(mesh['mesh_pos'],axis=0)
   mesh['face'] = np.expand_dims(mesh['face'],axis=0)
   mesh['face_type'] = np.expand_dims(mesh['face_type'],axis=0)
   mesh['face_length'] = np.expand_dims(mesh['face_length'],axis=0)
   mesh['cells_face'] = np.expand_dims(mesh['cells_face'],axis=0)
   mesh['cells_type'] = np.expand_dims(mesh['cells_type'],axis=0)
-  mesh['reinforced_boundary_cells_type'] = np.expand_dims(mesh['reinforced_boundary_cells_type'],axis=0)
   mesh['cells_area'] = np.expand_dims(mesh['cells_area'],axis=0)
   mesh['unit_norm_v'] = np.expand_dims(mesh['unit_norm_v'],axis=0)
-  #mesh = reorder_boundaryu_to_front(mesh)
-  # mesh = make_dim_less(mesh)
-  # if origin_writer is not None:
-  #   if mode.find('cylinder')!=-1:
-  #     mode = 'cylinder_flow'
-  #   elif mode.find('airfoil')!=-1:
-  #     mode = 'airfoil'
-  #     mesh['density'] = dataset['density']
-  #   mesh['velocity'] = mesh['target|velocity_on_node']
-  #   mesh['pressure'] = mesh['target|pressure_on_node']
-  #   mesh['cells'] = mesh['cells_node']
-  #   write_tfrecord_one_with_writer(origin_writer,mesh,mode=mode)
 
-  # # mode = mode
-  # write_tfrecord_one_with_writer(writer,mesh,mode=mode)
+
   print('{0}th mesh has been extracted'.format(index))
   trajectory = cal_relonyds_number(trajectory = mesh, mu=0.001, rho=1.)
   cylinder_node_mask, cylinder_face_mask , cylinder_cell_mask = extract_cylinder_boundary(trajectory)
@@ -794,15 +723,14 @@ def transform_to_cell_center_traj(trajectory,cylinder_node_mask,cylinder_face_ma
   cell_node = torch.from_numpy(trajectory['cells_node'][0]).T
   face_node = torch.from_numpy(trajectory['face'][0])
   
-  target_uvp_on_cell = cell_factor[:,0:1]*(torch.index_select(target_uvp_on_node,1,cell_node[0]))+cell_factor[:,1:2]*(torch.index_select(target_uvp_on_node,1,cell_node[1]))+cell_factor[:,1:2]*(torch.index_select(target_uvp_on_node,1,cell_node[2]))
+  target_uvp_on_cell = cell_factor[:,0:1]*(torch.index_select(target_uvp_on_node,1,cell_node[0]))+cell_factor[:,1:2]*(torch.index_select(target_uvp_on_node,1,cell_node[1]))+cell_factor[:,2:3]*(torch.index_select(target_uvp_on_node,1,cell_node[2]))
   
   target_uvp_on_edge = (torch.index_select(target_uvp_on_node,1,face_node[0])+torch.index_select(target_uvp_on_node,1,face_node[1]))/2.
   
-  predicted_uvp_on_cell = cell_factor[:,0:1]*(torch.index_select(predicted_uvp_on_node,1,cell_node[0]))+cell_factor[:,1:2]*(torch.index_select(predicted_uvp_on_node,1,cell_node[1]))+cell_factor[:,1:2]*(torch.index_select(predicted_uvp_on_node,1,cell_node[2]))
+  predicted_uvp_on_cell = cell_factor[:,0:1]*(torch.index_select(predicted_uvp_on_node,1,cell_node[0]))+cell_factor[:,1:2]*(torch.index_select(predicted_uvp_on_node,1,cell_node[1]))+cell_factor[:,2:3]*(torch.index_select(predicted_uvp_on_node,1,cell_node[2]))
   
   predicted_uvp_on_edge = (torch.index_select(predicted_uvp_on_node,1,face_node[0])+torch.index_select(predicted_uvp_on_node,1,face_node[1]))/2.
-  
-  
+
   result_to_tec_and_plot['mean_u'] = trajectory['mean_u']
   result_to_tec_and_plot['relonyds_num'] = trajectory['relonyds_num']
   result_to_tec_and_plot['mesh_pos'] = trajectory['mesh_pos'].repeat(traj_length,axis=0)
@@ -1659,7 +1587,6 @@ def parse_origin_dataset(dataset,unorder=False,index_num=0,plot=None,writer=None
       new_dataset['node_type'] = new_dataset['node_type'][0:1,:,:]
       write_tfrecord_one_with_writer(writer,new_dataset,mode='cylinder_flow')
       print('origin datasets No.{} has been parsed mesh\n'.format(index_num))    
-transformer = T.Compose([T.Distance(norm=False)])
 
 if __name__ == '__main__':
     # choose wether to transform whole datasets into h5 file
@@ -1758,7 +1685,7 @@ if __name__ == '__main__':
                 write_tecplot_ascii_nodal(dataset,False,'/home/litianyu/mycode/repos-py/FVM/my_FVNN/rollouts/0.pkl',tec_saving_path)
               if(path['stastic']):
                 stastic_nodeface_type(dataset['node_type'][0])
-              if(path['saving_mesh']):
+              if(path['saving_origin']):
                 rtval = extract_mesh_state(raw_data,writer,index,mode=path['mode'])
                 if not rtval:
                   print("parse error")

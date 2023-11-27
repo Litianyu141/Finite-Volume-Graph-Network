@@ -1,2 +1,0 @@
-sh download_dataset.sh airfoil C:/Users/DOOMDUKE-980PRO/source/repos-py/MeshGraphnets/offical-tf/meshgraphnets/
-python -m meshgraphnets.run_model --mode=train --model=airfoil --checkpoint_dir=C:/Users/DOOMDUKE-980PRO/source/repos-py/MeshGraphnets/offical-tf/meshgraphnets/chk --dataset_dir=C:/Users/DOOMDUKE-980PRO/source/repos-py/MeshGraphnets/offical-tf/meshgraphnets/airfoil

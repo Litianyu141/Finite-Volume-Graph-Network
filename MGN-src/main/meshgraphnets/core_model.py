@@ -29,10 +29,11 @@ MultiGraph = collections.namedtuple('Graph', ['node_features', 'edge_sets'])
 class GraphNetBlock(snt.AbstractModule):
   """Multi-Edge Interaction Network with residual connections."""
 
-  def __init__(self, model_fn, name='GraphNetBlock'):
+  def __init__(self, model_fn, dual_edge, name='GraphNetBlock'):
     super(GraphNetBlock, self).__init__(name=name)
     self._model_fn = model_fn
-
+    self._dual_edge = dual_edge
+    
   def _update_edge_features(self, node_features, edge_set):
     """Aggregrates node features, and applies edge function."""
     sender_features = tf.gather(node_features, edge_set.senders)
@@ -45,10 +46,18 @@ class GraphNetBlock(snt.AbstractModule):
     """Aggregrates edge features, and applies node function."""
     num_nodes = tf.shape(node_features)[0]
     features = [node_features]
-    for edge_set in edge_sets:
-      features.append(tf.math.unsorted_segment_sum(edge_set.features,
-                                                   edge_set.receivers,
-                                                   num_nodes))
+    if self._dual_edge:
+      for edge_set in edge_sets:
+        features.append(tf.math.unsorted_segment_sum(edge_set.features,
+                                                    edge_set.receivers,
+                                                    num_nodes))
+    else:
+      for edge_set in edge_sets:
+        twoway_recivers = tf.concat([edge_set.receivers,edge_set.senders],axis=0)
+        repeat_edge_features = tf.tile(edge_set.features,[2,1])
+        features.append(tf.math.unsorted_segment_sum(repeat_edge_features,
+                                                    twoway_recivers,
+                                                    num_nodes))
     with tf.variable_scope('node_fn'):
       return self._model_fn()(tf.concat(features, axis=-1))
 
@@ -81,13 +90,15 @@ class EncodeProcessDecode(snt.AbstractModule):
                latent_size,
                num_layers,
                message_passing_steps,
+               dual_edge=True,
                name='EncodeProcessDecode'):
     super(EncodeProcessDecode, self).__init__(name=name)
     self._latent_size = latent_size
     self._output_size = output_size
     self._num_layers = num_layers
     self._message_passing_steps = message_passing_steps
-
+    self._dual_edge=dual_edge
+    
   def _make_mlp(self, output_size, layer_norm=True):
     """Builds an MLP."""
     widths = [self._latent_size] * self._num_layers + [output_size]
@@ -117,5 +128,5 @@ class EncodeProcessDecode(snt.AbstractModule):
     model_fn = functools.partial(self._make_mlp, output_size=self._latent_size)
     latent_graph = self._encoder(graph)
     for _ in range(self._message_passing_steps):
-      latent_graph = GraphNetBlock(model_fn)(latent_graph)
+      latent_graph = GraphNetBlock(model_fn,self._dual_edge)(latent_graph)
     return self._decoder(latent_graph)

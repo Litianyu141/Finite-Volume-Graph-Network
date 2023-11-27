@@ -31,7 +31,7 @@ class NodeType(enum.IntEnum):
   SIZE = 9
 
 
-def triangles_to_edges(faces):
+def triangles_to_edges(faces,dual_edge=True):
   """Computes mesh edges from triangles."""
   # collect edges from triangles
   edges = tf.concat([faces[:, 0:2],
@@ -46,6 +46,10 @@ def triangles_to_edges(faces):
   # remove duplicates and unpack
   unique_edges = tf.bitcast(tf.unique(packed_edges)[0], tf.int32)
   senders, receivers = tf.unstack(unique_edges, axis=1)
-  # create two-way connectivity
-  return (tf.concat([senders, receivers], axis=0),
-          tf.concat([receivers, senders], axis=0))
+
+  if dual_edge:
+    # create two-way connectivity
+    return (tf.concat([senders, receivers], axis=0),
+            tf.concat([receivers, senders], axis=0))
+  else:
+    return (senders, receivers)

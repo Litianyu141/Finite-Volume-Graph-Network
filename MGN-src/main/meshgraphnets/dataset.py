@@ -24,8 +24,6 @@ import tensorflow as tf
 
 from meshgraphnets.common import NodeType
 
-os.environ['CUDA_VISIVLE_DEVICES']='1'
-tf.device('gpu/1')
 
 def _parse(proto, meta):
   """Parses a trajectory from tf.Example."""
@@ -63,11 +61,11 @@ def add_targets(ds, fields, add_history):
   def fn(trajectory):
     out = {}
     for key, val in trajectory.items():
-      out[key] = val[1:-1]
+      out[key] = val[0:-1]
       if key in fields:
         if add_history:
           out['prev|'+key] = val[0:-2]
-        out['target|'+key] = val[2:]
+        out['target|'+key] = val[1:]
     return out
   return ds.map(fn, num_parallel_calls=8)
 
