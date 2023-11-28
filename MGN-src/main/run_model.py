@@ -296,14 +296,7 @@ def parse_node_center_to_cell_center(traj_data,rollout_index,uv_MSE,plot_boundar
   rollout_time_length = cell_center_trajectory_with_boundary['target|UVP'].shape[0]
   
   saving_path = os.path.split(FLAGS.rollout_path)[0]+"/rollout_index"+str(rollout_index) +f'/Re(%2e)'%cell_center_trajectory['relonyds_num']+f'_mu(%e)'%FLAGS.mu+'_'+'rolloutsteps'+str(rollout_time_length)+f"_MSE(%2e)"%uv_MSE +'.dat'
-  # if traj_idx==0:
-  #   os.makedirs(os.path.split(saving_path)[0],exist_ok=True)
-  #   sorted_keys = sorted(cell_center_trajectory_with_boundary.keys(), key=lambda x: x[0])
-  #   sorted_center_trajectory_with_boundary = {k: cell_center_trajectory_with_boundary[k] for k in sorted_keys}
-  #   with open(os.path.split(FLAGS.rollout_path)[0]+"/rollout_index"+str(rollout_index) +f'/Re(%2e)'%cell_center_trajectory['relonyds_num']+'data.json', 'w', encoding='utf-8') as f:
-  #       converted_dict = {k: v.tolist() if isinstance(v, np.ndarray) else v for k, v in sorted_center_trajectory_with_boundary.items()}
-  #       json.dump(converted_dict, f, ensure_ascii=False, indent=4)
-        
+  
   write_tecplot_ascii_cell_centered(raw_data=cell_center_trajectory_with_boundary,
                                     saving_path=saving_path,
                                     plot_boundary_p_time_step=plot_boundary_p_time_step,
