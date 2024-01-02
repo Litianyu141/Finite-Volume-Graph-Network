@@ -1,5 +1,5 @@
 # Overview
-This is the modified repo from https://github.com/google-deepmind/deepmind-research/tree/master/meshgraphnets, which made meshgraphnet can predict pressure field， plot Cl Cd and write to tecplot. You can find more info from the original repo. We also add single edge encode method support.
+This is the modified repo from https://github.com/google-deepmind/deepmind-research/tree/master/meshgraphnets, which made meshgraphnets can predict pressure field， plot Cl Cd and write to tecplot. You can find more info from the original repo. We also add single edge encode method support.
 
 # Download dataset
 Datasets can be downloaded using the script download_dataset.sh. They contain a metadata file describing the available fields and their shape, and tfrecord datasets for train, valid and test splits. Dataset names match the naming in the paper. This repo is only suit for incompressible dataset.
