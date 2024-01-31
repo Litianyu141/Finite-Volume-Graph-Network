@@ -41,7 +41,6 @@ from meshgraphnets import cloth_model
 from meshgraphnets import core_model
 from meshgraphnets import dataset
 from meshgraphnets.parse_tfrecord_refactor import extract_mesh_state
-from meshgraphnets.write_tec_plot_boundary  import write_tecplot_ascii_cell_centered
 
 FLAGS = flags.FLAGS
 flags.DEFINE_enum('mode', 'train', ['train', 'eval'],
@@ -294,15 +293,6 @@ def parse_node_center_to_cell_center(traj_data,rollout_index,uv_MSE,plot_boundar
   traj_data['pressure'] = traj_data['gt_pressure']
   cell_center_trajectory,cell_center_trajectory_with_boundary = extract_mesh_state(traj_data,None,rollout_index,mode="cylinder_mesh")
   rollout_time_length = cell_center_trajectory_with_boundary['target|UVP'].shape[0]
-  
-  saving_path = os.path.split(FLAGS.rollout_path)[0]+"/rollout_index"+str(rollout_index) +f'/Re(%2e)'%cell_center_trajectory['relonyds_num']+f'_mu(%e)'%FLAGS.mu+'_'+'rolloutsteps'+str(rollout_time_length)+f"_MSE(%2e)"%uv_MSE +'.dat'
-  
-  write_tecplot_ascii_cell_centered(raw_data=cell_center_trajectory_with_boundary,
-                                    saving_path=saving_path,
-                                    plot_boundary_p_time_step=plot_boundary_p_time_step,
-                                    save_tec=save_tec,
-                                    plot_boundary=plot_boundary
-                                    )
   
   return cell_center_trajectory,cell_center_trajectory_with_boundary
   
