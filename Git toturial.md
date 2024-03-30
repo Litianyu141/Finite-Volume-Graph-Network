@@ -1,2 +1,0 @@
-#Caption
-__pycache__

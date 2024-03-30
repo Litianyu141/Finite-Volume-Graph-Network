@@ -1,0 +1,20 @@
+tensorflow-gpu==1.15 # for converting TFrecord Dataset
+dm-sonnet<2
+matplotlib
+absl-py
+numpy
+matplotlib
+torch_geometric
+h5py
+torch_cluster==1.5.9
+torch==1.9.0
+numpy
+absl_py
+tfrecord
+circle_fit
+statsmodels
+natsort
+GitPython
+tensorboard
+setuptools==59.5.0
+torch_scatter==2.0.8
