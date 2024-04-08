@@ -20,7 +20,7 @@ Set .mphtxt and data file path in FVGN-src/main/Extract_mesh/parse_comsol.py, an
 
 
 # Env
-We have directly provided a conda environment package that supports both FVGN and MGN simultaneously（download:https://mega.nz/file/YThnBYZJ#LbcXSTXO70eVZPmRC79g7lNmb4UJvDBF5Uh96VpjzeI）. All you need to do is download and unzip it to the "/path/miniconda3/envs/" directory (note that the new folder's name must be meshgn-pt-tf). Then, run the command
+We have directly provided a conda environment package that supports both FVGN and MGN simultaneously（download:https://mega.nz/folder/tHJiXDhR#Zy8u7h6dOBgj3DdbM_0o9g）. All you need to do is download and unzip it to the "/path/miniconda3/envs/" directory (note that the new folder's name must be meshgn-pt-tf). Then, run the command
 ~~~sh
 conda env list
 ~~~
