@@ -397,7 +397,7 @@ def rearrange_dict(zone):
     dict_list = []
     build = False
     for k, v in zone.items():
-        if k == "zonename" or k == "mean_u" or k == "relonyds_num" or k == "cylinder_D":
+        if k == "zonename" or k == "mean_u" or k == "reynolds_num" or k == "cylinder_D":
             continue
         if v.shape[2] > 1:
             for j in range(v.shape[2]):
@@ -406,7 +406,7 @@ def rearrange_dict(zone):
                     if (
                         k == "zonename"
                         or k == "mean_u"
-                        or k == "relonyds_num"
+                        or k == "reynolds_num"
                         or k == "cylinder_D"
                     ):
                         continue
@@ -421,7 +421,7 @@ def rearrange_dict(zone):
                     if (
                         k == "zonename"
                         or k == "mean_u"
-                        or k == "relonyds_num"
+                        or k == "reynolds_num"
                         or k == "cylinder_D"
                     ):
                         continue
@@ -434,7 +434,7 @@ def rearrange_dict(zone):
                 if (
                     k == "zonename"
                     or k == "mean_u"
-                    or k == "relonyds_num"
+                    or k == "reynolds_num"
                     or k == "cylinder_D"
                 ):
                     continue

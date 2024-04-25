@@ -54,7 +54,7 @@ def params(load=None,fore_args_parser=None):
 		parser.add_argument('--n_epochs', default=14000, type=int, help='number of epochs (after each epoch, the model gets saved)')
 		parser.add_argument('--hidden_size', default=128, type=int, help='hidden size of network (default: 20)')
 		parser.add_argument('--traj_length', default=600, type=int, help='dataset traj_length (default: cylinder 599)')
-		parser.add_argument('--batch_size', default=24, type=int, help='batch size (default: 100)')
+		parser.add_argument('--batch_size', default=16, type=int, help='batch size (default: 100)')
 		parser.add_argument('--cumulative_length', default=600, type=int, help='number of time steps to accmulate stastics in normalizer (default: 600)')
 		parser.add_argument('--train_traj_length', default=400, type=int, help='number of time steps to train  (default: 300)')
 		parser.add_argument('--cuda', default=True, type=str2bool, help='use GPU')
@@ -112,13 +112,13 @@ def params(load=None,fore_args_parser=None):
 		parser.add_argument('--dataset_size', default=1000, type=int, help='size of dataset (default: 1000)')
 		parser.add_argument('--dataset_type', default="h5", type=str, help='define your dataset file type tfrecode or h5 (default:tf)')
 		parser.add_argument('--dataset_dir', default='/home/litianyu/dataset/MeshGN/cylinder_flow/mesh_with_target_on_node_chk', type=str, help='load latest version for training (if True: leave load_date_time and load_index None. default: False)')
-		parser.add_argument('--dataset_dir_h5', default='/lvm_data/litianyu/dataset/MeshGN/new_hybrid_dataset_Re=200-1500/h5', type=str, help='load latest version for training (if True: leave load_date_time and load_index None. default: False)')
+		parser.add_argument('--dataset_dir_h5', default='/data/litianyu/dataset/MeshGN/cylinder_flow/origin_dataset/conveted_h5', type=str, help='load latest version for training (if True: leave load_date_time and load_index None. default: False)')
   
 		# validate params
 		parser.add_argument('--model_dir', default='', type=str, help='load latest version for validating (if True: leave load_date_time and load_index None. default: False)')
   
 		#git information
-		if True:
+		if False:
 			import git
 			currentdir = os.getcwd()
 			repo = git.Repo(currentdir)

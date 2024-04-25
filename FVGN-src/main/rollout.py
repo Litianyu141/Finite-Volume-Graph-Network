@@ -517,7 +517,7 @@ def rollout(
 
     # composing fluid zone and boundary zone for writing tecplot file and plotting CL and CD
     result["mean_u"] = mean_u.cpu().numpy()
-    result["relonyds_num"] = re_num.cpu().numpy()
+    result["reynolds_num"] = re_num.cpu().numpy()
     result["mesh_pos"] = (
         mbatch_graph_node.pos[:, :]
         .to("cpu")

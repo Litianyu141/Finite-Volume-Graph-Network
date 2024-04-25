@@ -170,7 +170,7 @@ def evaluator(model, params):
                  'v_rmse':[],
                  'uv_rmse':[],
                  'p_rmse':[],
-                 'relonyds_num':[]}
+                 'reynolds_num':[]}
       
       for traj_idx in range(FLAGS.num_rollouts):
         logging.info('Rollout trajectory %d', traj_idx)
@@ -190,7 +190,7 @@ def evaluator(model, params):
                                                                     plot_boundary=FLAGS.plot_boundary,
                                                                     traj_idx=traj_idx)
         
-        scalar_data['relonyds_num'] = cell_center_trajectory['relonyds_num']
+        scalar_data['reynolds_num'] = cell_center_trajectory['reynolds_num']
         
         '''plot mesh'''
         fig, ax = plt.subplots(1, 1, figsize=(16, 9))
@@ -210,7 +210,7 @@ def evaluator(model, params):
     
         '''write error to file'''
         # 使用 f-string 完整构建文件路径
-        file_name = f"Re({cell_center_trajectory['relonyds_num']:2e})_UV_RMSE({np.mean(scalar_data['uv_rmse']):2e}).csv"
+        file_name = f"Re({cell_center_trajectory['reynolds_num']:2e})_UV_RMSE({np.mean(scalar_data['uv_rmse']):2e}).csv"
         file_path = f"{saving_path}/{file_name}"
         
         # 使用 pickle 保存数据
@@ -240,7 +240,7 @@ def evaluator(model, params):
         writer = csv.writer(csvfile)
 
         for key, value in scalars.items():
-            if 'relonyds_num' in key:
+            if 'reynolds_num' in key:
               continue
             total_frames_error = np.stack(value, axis=0)
             

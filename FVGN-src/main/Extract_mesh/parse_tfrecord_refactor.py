@@ -26,11 +26,11 @@ import torch
 from torch_geometric.data import Data
 import numpy as np
 from torch_scatter import scatter_add, scatter_mean
-
+import matplotlib
+matplotlib.use("agg")
 import matplotlib.pyplot as plt
 from utils.write_tec import write_tecplot_ascii_nodal
 from matplotlib import tri as mtri
-import matplotlib.pyplot as plt
 from matplotlib import animation
 
 from circle_fit import hyper_fit
@@ -873,7 +873,7 @@ def extract_mesh_state(
     mesh["target|pressure_on_node"] = (
         p_target  # obviously, velocity with BC, IC is v_pressure[1]
     )
-    if "compressible" in solving_params["name"]:
+    if solving_params["name"] == "compressible":
         mesh["target|density"] = dataset["density"]
 
     # compute cell_area
@@ -898,7 +898,7 @@ def extract_mesh_state(
     mesh["cells_area"] = np.expand_dims(mesh["cells_area"], axis=0)
     mesh["unit_norm_v"] = np.expand_dims(mesh["unit_norm_v"], axis=0)
 
-    mesh = cal_mean_u_and_cd(mesh, path)
+    mesh = cal_mean_u_and_cd(mesh, solving_params)
 
     """ >>>         stastic_nodeface_type           >>>"""
     # print("After renumed data has cell type:")
@@ -963,7 +963,10 @@ def extract_mesh_state(
         current_traj = h5_writer.create_group(str(index))
         for key, value in mesh.items():
             current_traj.create_dataset(key, data=value)
-    print(f'{index}th mesh has been extracted, path is {path["mesh_file_path"]}')
+    try:
+        print(f'{index}th mesh has been extracted, path is {path["mesh_file_path"]}')
+    except:
+        print(f'{index}th mesh has been extracted')
 
     return True
 
@@ -1048,8 +1051,7 @@ def cal_mean_u_and_cd(trajectory,path):
     Inlet = target_on_edge[face_type==NodeType.INFLOW][:,0]
     face_length = torch.from_numpy(trajectory['face_length'])[0][:,0][face_type==NodeType.INFLOW]
     total_u = torch.sum(Inlet*face_length)
-    ghosted_mesh_pos = torch.from_numpy(trajectory['mesh_pos'][0])
-    mesh_pos = torch.from_numpy(trajectory['mesh_pos'][0])[(node_type!=NodeType.GHOST_INFLOW)&(node_type!=NodeType.GHOST_OUTFLOW)&(node_type!=NodeType.GHOST_WALL)]
+    mesh_pos = torch.from_numpy(trajectory['mesh_pos'][0])
     top = torch.max(mesh_pos[:,1]).numpy()
     bottom = torch.min(mesh_pos[:,1]).numpy()
     mean_u = (total_u/(top-bottom)).to(torch.float32).numpy()
@@ -1064,7 +1066,7 @@ def cal_mean_u_and_cd(trajectory,path):
     average_angle = torch.mean(angles_deg)
     trajectory['aoa'] = average_angle.numpy()
   
-    boundary_pos = ghosted_mesh_pos[node_type==NodeType.WALL_BOUNDARY].numpy()
+    boundary_pos = mesh_pos[node_type==NodeType.WALL_BOUNDARY].numpy()
     cylinder_mask = torch.full((boundary_pos.shape[0],1),True).view(-1).numpy()
     cylinder_not_mask = np.logical_not(cylinder_mask)
     cylinder_mask = np.where(((boundary_pos[:,1]>bottom)&(boundary_pos[:,1]<top)),cylinder_mask,cylinder_not_mask)
@@ -1086,7 +1088,7 @@ def cal_mean_u_and_cd(trajectory,path):
     trajectory['mean_u'] = mean_u
     trajectory['charac_scale'] = L0
     trajectory['rho'] = rho
-    trajectory['rho'] = mu
+    trajectory['mu'] = mu
     trajectory['reynolds_num'] = (mean_u*L0)/mu
     
     return trajectory
@@ -1144,7 +1146,7 @@ def make_dim_less(trajectory, params=None):
     ).numpy()
 
     trajectory["mean_u"] = mean_u.view(1, 1, 1).numpy()
-    trajectory["cylinder_diameter"] = L0.view(1, 1, 1).numpy()
+    trajectory["charac_scale"] = L0.view(1, 1, 1).numpy()
     return trajectory
 
 
@@ -3021,7 +3023,7 @@ if __name__ == "__main__":
     # choose wether to transform whole datasets into h5 file
     path = {
         "tf_datasetPath": "/data/litianyu/dataset/MeshGN/cylinder_flow/origin_dataset",
-        "h5_save_path": "H/data/litianyu/dataset/MeshGN/cylinder_flow/origin_dataset/h5/airfoil",
+        "h5_save_path": "/data/litianyu/dataset/MeshGN/cylinder_flow/origin_dataset/conveted_h5",
         "tec_save_path": "/data/litianyu/dataset/MeshGN/cylinder_flow/origin_dataset/cylinder_flow/meshs/",
         "saving_tec": False,
         "saving_h5": True,
@@ -3031,11 +3033,6 @@ if __name__ == "__main__":
                     "rho":1.,
                     "mu":0.001,
                     "dt":0.01}
-    
-    pickl_path = path["pickl_save_path"]
-    tf_datasetPath = path["tf_datasetPath"]
-    numofsd = 2
-    os.makedirs(path["tf_datasetPath"], exist_ok=True)
 
     """set current work directory"""
     imgoutputdir = os.path.split(__file__)[0] + "/imgoutput"
@@ -3043,18 +3040,13 @@ if __name__ == "__main__":
     current_file_dir = os.chdir(imgoutputdir)
 
     for split in ["valid", "train", "test"]:
-        ds = load_dataset(tf_datasetPath, split)
+        ds = load_dataset(path["tf_datasetPath"], split)
         rearrange_frame_sp_1 = []
         rearrange_frame_sp_2 = []
         raw_data = {}
-        tf_saving_mesh_path = (
-            path["mesh_save_path"] + "_" + solving_params["name"] + "_" + split + ".tfrecord"
-        )
-        save_path = (
-            path["h5_save_path"] + "_" + solving_params["name"] + "_" + split + "_" + ".h5"
-        )
-        with h5py.File(save_path, "w") as h5_writer:
-            with tf.io.TFRecordWriter(tf_saving_mesh_path) as tf_writer:
+        h5_save_path = f"{path['h5_save_path']}/{split}.h5"
+
+        with h5py.File(h5_save_path, "w") as h5_writer:
                 for index, data_dict in enumerate(ds):
                     for key, value in data_dict.items():
                         raw_data[key] = value.numpy()
@@ -3081,7 +3073,7 @@ if __name__ == "__main__":
                             raw_data,
                             h5_writer,
                             index,
-                            params=solving_params,
+                            solving_params=solving_params,
                             h5_writer=h5_writer,
                             path=path,
                         )

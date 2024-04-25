@@ -1,0 +1,6 @@
+Logger
+FVGN-src/main/utils/__pycache__
+FVGN-src/main/dataset/__pycache__
+FVGN-src/main/FVGN_model/__pycache__
+FVGN-src/main/train_handler.txt
+FVGN-src/main/train_log.txt

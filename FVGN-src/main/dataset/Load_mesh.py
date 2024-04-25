@@ -57,7 +57,7 @@ description = {
     "target|velocity_on_node": "byte",
     "target|pressure_on_node": "byte",
     "mean_u": "byte",
-    "cylinder_diameter": "byte",
+    "charac_scale": "byte",
 }
 
 
@@ -151,7 +151,7 @@ class CFDdatasetIt(IterableDataset):
 
         rho = params.rho
         mu = params.mu
-        trajectory["relonyds_num"] = (mean_u * L0 * rho) / mu
+        trajectory["reynolds_num"] = (mean_u * L0 * rho) / mu
         return trajectory
 
     def process_trajectory(self, trajectory_data):
@@ -472,32 +472,32 @@ class Data_Pool(Dataset):
             minibatch_data = self.pool[case_id]
             cells_type = torch.as_tensor(minibatch_data["cells_type"][0]).to(torch.long)
             try:
-                relonyds_num = torch.as_tensor(
-                    minibatch_data["relonyds_num"][0]
+                reynolds_num = torch.as_tensor(
+                    minibatch_data["reynolds_num"][0]
                 ).repeat(cells_type.shape[0], 1)
+                
             except:
-                mean_u = torch.as_tensor(minibatch_data["mean_u"][0]).repeat(
+                mean_u = torch.as_tensor(minibatch_data["mean_u"][()]).view(-1,1).repeat(cells_type.shape[0], 1)
+                
+                R = torch.as_tensor(minibatch_data["charac_scale"][0]).repeat(
                     cells_type.shape[0], 1
                 )
-                R = torch.as_tensor(minibatch_data["cylinder_diameter"][0]).repeat(
-                    cells_type.shape[0], 1
-                )
-                relonyds_num = mean_u * 1.0 * R / 0.001
+                reynolds_num = mean_u * 1.0 * R / 0.001
         elif self.params.dataset_type == "h5":
             minibatch_data = self.pool[str(case_id)]
             cells_type = torch.as_tensor(minibatch_data["cells_type"][0]).to(torch.long)
             try:
-                relonyds_num = torch.as_tensor(
-                    minibatch_data["relonyds_num"][0]
-                ).repeat(cells_type.shape[0], 1)
+                reynolds_num = torch.as_tensor(
+                    minibatch_data["reynolds_num"][()]
+                ).view(-1,1).repeat(cells_type.shape[0], 1)
+                
             except:
-                mean_u = torch.as_tensor(minibatch_data["mean_u"][0]).repeat(
+                mean_u = torch.as_tensor(minibatch_data["mean_u"][()]).view(-1,1).repeat(cells_type.shape[0], 1)
+                
+                R = torch.as_tensor(minibatch_data["charac_scale"][0]).repeat(
                     cells_type.shape[0], 1
                 )
-                R = torch.as_tensor(minibatch_data["cylinder_diameter"][0]).repeat(
-                    cells_type.shape[0], 1
-                )
-                relonyds_num = (mean_u * 1.0 * R / 0.001).to(torch.float32)
+                reynolds_num = (mean_u * 1.0 * R / 0.001).to(torch.float32)
         else:
             raise ValueError("wrong dataset type")
 
@@ -541,7 +541,7 @@ class Data_Pool(Dataset):
         )
         cell_face = torch.as_tensor(minibatch_data["cells_face"][0], dtype=torch.long)
         cells_type = torch.as_tensor(minibatch_data["cells_type"][0]).to(torch.long)
-        # cell_attr = torch.cat((cells_type,relonyds_num),dim=1)
+        # cell_attr = torch.cat((cells_type,reynolds_num),dim=1)
         cell_attr = torch.cat((cells_type, torch.zeros_like(cells_type)), dim=1)
 
         # edge_attr
@@ -580,7 +580,7 @@ class Data_Pool(Dataset):
             cell_area=cell_area,
             cell_factor=cell_factor,
             pos=centroid,
-            y=relonyds_num,
+            y=reynolds_num,
             graph_index=torch.as_tensor(idx),
         )
 
@@ -592,32 +592,28 @@ class Data_Pool(Dataset):
             minibatch_data = self.pool[graph_indices]
             cells_type = torch.as_tensor(minibatch_data["cells_type"][0]).to(torch.long)
             try:
-                relonyds_num = torch.as_tensor(
-                    minibatch_data["relonyds_num"][0]
+                reynolds_num = torch.as_tensor(
+                    minibatch_data["reynolds_num"][0]
                 ).repeat(cells_type.shape[0], 1)
             except:
-                mean_u = torch.as_tensor(minibatch_data["mean_u"][0]).repeat(
+                mean_u = torch.as_tensor(minibatch_data["mean_u"][()]).view(-1,1).repeat(cells_type.shape[0], 1)
+                R = torch.as_tensor(minibatch_data["charac_scale"][0]).repeat(
                     cells_type.shape[0], 1
                 )
-                R = torch.as_tensor(minibatch_data["cylinder_diameter"][0]).repeat(
-                    cells_type.shape[0], 1
-                )
-                relonyds_num = mean_u * 1.0 * R / 0.001
+                reynolds_num = mean_u * 1.0 * R / 0.001
         elif self.params.dataset_type == "h5":
             minibatch_data = self.pool[str(graph_indices)]
             cells_type = torch.as_tensor(minibatch_data["cells_type"][0]).to(torch.long)
             try:
-                relonyds_num = torch.as_tensor(
-                    minibatch_data["relonyds_num"][0]
-                ).repeat(cells_type.shape[0], 1)
+                reynolds_num = torch.as_tensor(
+                    minibatch_data["reynolds_num"][()]
+                ).view(-1,1).repeat(cells_type.shape[0], 1)
             except:
-                mean_u = torch.as_tensor(minibatch_data["mean_u"][0]).repeat(
+                mean_u = torch.as_tensor(minibatch_data["mean_u"][()]).view(-1,1).repeat(cells_type.shape[0], 1)
+                R = torch.as_tensor(minibatch_data["charac_scale"][0]).repeat(
                     cells_type.shape[0], 1
                 )
-                R = torch.as_tensor(minibatch_data["cylinder_diameter"][0]).repeat(
-                    cells_type.shape[0], 1
-                )
-                relonyds_num = (mean_u * 1.0 * R / 0.001).to(torch.float32)
+                reynolds_num = (mean_u * 1.0 * R / 0.001).to(torch.float32)
         else:
             raise ValueError("wrong dataset type")
         """Optional node attr"""
@@ -646,11 +642,9 @@ class Data_Pool(Dataset):
             minibatch_data["cell_factor"][0], dtype=torch.float32
         )
         cell_face = torch.as_tensor(minibatch_data["cells_face"][0], dtype=torch.long)
-        # cell_attr = torch.cat((cells_type,relonyds_num),dim=1)
+        # cell_attr = torch.cat((cells_type,reynolds_num),dim=1)
         cell_attr = torch.cat((cells_type, torch.zeros_like(cells_type)), dim=1)
-        mean_u = torch.as_tensor(minibatch_data["mean_u"][0]).repeat(
-            cells_type.shape[0], 1
-        )
+        mean_u = torch.as_tensor(minibatch_data["mean_u"][()]).view(-1,1).repeat(cells_type.shape[0], 1)
 
         # edge_attr
         face_length = torch.as_tensor(minibatch_data["face_length"][0]).to(
@@ -735,7 +729,7 @@ class Data_Pool(Dataset):
                     self.pool += tmp
                 index = 0
                 for traj in tmp:
-                    if traj["relonyds_num"] < 100:
+                    if traj["reynolds_num"] < 100:
                         self.simple_pool_index.append(
                             int(len(self.pool) - len(tmp)) + index
                         )
@@ -753,7 +747,7 @@ class Data_Pool(Dataset):
             else:
                 self.pool = h5py.File(self.params.dataset_dir_h5 + f"/{split}.h5", "r")
 
-            # return self.params.dataset_dir_h5
+            return self.params.dataset_dir_h5
         """
         TODO: reset all graph to the same size                        UPDATE: not necessary
         min_node = 3000
