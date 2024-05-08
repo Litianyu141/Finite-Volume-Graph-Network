@@ -1,15 +1,19 @@
 #!/bin/bash
-BASE_TRAIN_DIR="/home/doomduke/GEP-FVGN/repos-py/FVM/my_FVNN"
-LOG_FILE="/home/doomduke/GEP-FVGN/Logger/net GN-Cell; hs 128; mu 0.001; rho 1; dt 0.01;/Hybrid_loss_mom_normalize_grid_feature=10.txt"
-exec > $BASE_TRAIN_DIR/train_handler.txt 2>&1
+
+# 获取脚本所在的目录
+SCRIPT_DIR=$(dirname "$0")
+
+LOG_FILE=$SCRIPT_DIR/train_log.txt
+
+exec > $SCRIPT_DIR/train_handler.txt 2>&1
 
 # training set
-batch_size=16
+batch_size=8
 lr=0.001
 loss_cont=1
 loss_mom=10
 dataset_type="h5"
-dataset_dir_h5="/mnt/h/Hybrid-dataset-Re200-1500/converted_dataset_1st/h5"
+dataset_dir_h5="/data/litianyu/dataset/MeshGN/cylinder_flow/origin_dataset/conveted_h5"
 loss="direct_mean_loss"
 nn_act="SiLU"
 Noise_injection_factor=0.02
@@ -22,7 +26,7 @@ while true; do
     echo "Starting training..."
 
     # 构造基本命令
-    CMD="python -u $BASE_TRAIN_DIR/train.py --batch_size=$batch_size --lr=$lr --dataset_type=$dataset_type --dataset_dir_h5=$dataset_dir_h5 --loss=$loss --nn_act=$nn_act --Noise_injection_factor=$Noise_injection_factor --loss_cont=$loss_cont --loss_mom=$loss_mom"
+    CMD="python -u $SCRIPT_DIR/train.py --batch_size=$batch_size --lr=$lr --dataset_type=$dataset_type --dataset_dir_h5=$dataset_dir_h5 --loss=$loss --nn_act=$nn_act --Noise_injection_factor=$Noise_injection_factor --loss_cont=$loss_cont --loss_mom=$loss_mom"
     
     # 根据load_date和load_index的值添加对应的参数
     if [ -n "$load_date" ]; then

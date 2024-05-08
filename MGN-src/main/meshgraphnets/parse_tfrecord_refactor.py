@@ -21,7 +21,6 @@ sys.path.insert(0, os.path.split(os.path.abspath(__file__))[0])
 import torch
 
 import matplotlib.pyplot as plt
-from write_tec_plot_boundary import write_tecplot_ascii_nodal
 from matplotlib import tri as mtri
 import matplotlib.pyplot as plt
 from matplotlib import animation
@@ -394,7 +393,7 @@ def serialize_example(record,mode='airfoil'):
         "target|velocity_on_node": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['target|velocity_on_node'].tobytes()])),
         "target|pressure_on_node": tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['target|pressure_on_node'].tobytes()])),
         'mean_u': tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['mean_u'].tobytes()])),
-        'cylinder_diameter': tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['cylinder_diameter'].tobytes()]))
+        'charac_scale': tf.train.Feature(bytes_list=tf.train.BytesList(value=[record['charac_scale'].tobytes()]))
     }
   elif mode == 'airfoil_mesh':
     feature = {
@@ -732,7 +731,7 @@ def transform_to_cell_center_traj(trajectory,cylinder_node_mask,cylinder_face_ma
   predicted_uvp_on_edge = (torch.index_select(predicted_uvp_on_node,1,face_node[0])+torch.index_select(predicted_uvp_on_node,1,face_node[1]))/2.
 
   result_to_tec_and_plot['mean_u'] = trajectory['mean_u']
-  result_to_tec_and_plot['relonyds_num'] = trajectory['relonyds_num']
+  result_to_tec_and_plot['reynolds_num'] = trajectory['reynolds_num']
   result_to_tec_and_plot['mesh_pos'] = trajectory['mesh_pos'].repeat(traj_length,axis=0)
   result_to_tec_and_plot['cells'] = trajectory['cells_node'].repeat(traj_length,axis=0)
   result_to_tec_and_plot['node_type'] = trajectory['node_type'].repeat(traj_length,axis=0)
@@ -793,7 +792,7 @@ def cal_relonyds_number(trajectory,mu,rho):
     L0 = R*2.
     rho = rho
     mu = mu
-    trajectory['relonyds_num'] = ((mean_u*L0*rho)/mu).numpy()
+    trajectory['reynolds_num'] = ((mean_u*L0*rho)/mu).numpy()
     trajectory['mean_u'] = mean_u.numpy()
     return trajectory 
   
@@ -884,7 +883,7 @@ def make_dim_less(trajectory,params=None):
     trajectory['target|pressure_on_node'] = (trajectory['target|pressure_on_node']/((mean_u**2)*(L0**2)*rho)).numpy()
     
     trajectory['mean_u'] = mean_u.view(1,1,1).numpy()
-    trajectory['cylinder_diameter'] = L0.view(1,1,1).numpy()
+    trajectory['charac_scale'] = L0.view(1,1,1).numpy()
     return trajectory
       
 def seprate_cells(mesh_pos,cells,node_type,density,pressure,velocity,index):
@@ -1680,9 +1679,6 @@ if __name__ == '__main__':
                     plt.show(block=True)  
                     ani.save("order"+"train.gif", writer='pillow')  
                     
-              if(path['saving_tec']):
-                tec_saving_path = path['tec_save_path']+model['name']+'_'+split+'_'+str(index)+'.dat'
-                write_tecplot_ascii_nodal(dataset,False,'/home/litianyu/mycode/repos-py/FVM/my_FVNN/rollouts/0.pkl',tec_saving_path)
               if(path['stastic']):
                 stastic_nodeface_type(dataset['node_type'][0])
               if(path['saving_origin']):

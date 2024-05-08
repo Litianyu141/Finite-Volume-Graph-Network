@@ -160,7 +160,7 @@ class FVGN(nn.Module):
         if self.training:
             cells_type = graph.x[:, 0:1]
             faces_type = graph_edge.x[:, 0:1]
-            # relonyds_num = graph.x[:,1:2]
+            # reynolds_num = graph.x[:,1:2]
             current_cell_frames = graph.x[:, 2:4]
 
             """perform *************************NOISE INJECTION*********************** at cell attr and edge attributes"""
@@ -250,7 +250,7 @@ class FVGN(nn.Module):
             """Rolling out results"""
             cells_type = graph.x[:, 0:1]
             faces_type = graph_edge.x[:, 0:1]
-            # relonyds_num = graph.x[:,1:2]
+            # reynolds_num = graph.x[:,1:2]
             current_cell_frames = graph.x[:, 2:4]
             noised_cell_frames = current_cell_frames
             # target_face_uvp_normalized = self._face_uvp_flux_output_normalizer(graph_edge.y)

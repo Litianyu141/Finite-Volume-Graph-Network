@@ -87,7 +87,6 @@ def validate_loop(
                 dt=params.dt,
                 edge_one_hot=params.edge_one_hot,
                 cell_one_hot=params.cell_one_hot,
-                mask=mask_face_v_b,
             )
 
             next_UV_predicteds_list.append((next_UV_on_cell_v[:, 0:2]).unsqueeze(0))

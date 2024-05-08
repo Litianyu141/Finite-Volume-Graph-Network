@@ -29,7 +29,7 @@ else:
 # torch.manual_seed(0)
 
 # check cuda
-torch.cuda.set_per_process_memory_fraction(0.99, 1)
+torch.cuda.set_per_process_memory_fraction(0.99, 0)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # initialize flow parameters
@@ -255,7 +255,7 @@ while True:
             and (training_round > 0)
             and (current_num_samples == 0)
         ):
-            # if True:
+        # if True:
             model_saved_path = logger.save_state(
                 model=fluid_model,
                 optimizer=optimizer,
@@ -279,7 +279,7 @@ while True:
                         f"--valid_dataset_dir={host_dataset_dir}",
                         f"--training_round={training_round}",
                         f"--valid_dataset_type={params.dataset_type}",
-                        f"--host_device={"cuda:1"}", # we recommand train with 2 cuda device, one is for training and another for real time testing/validating to reach fastest traing speed
+                        f"--host_device={'cuda:1'}", # we recommand train with 2 cuda device, one is for training and another for real time testing/validating to reach fastest traing speed
                     ],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
