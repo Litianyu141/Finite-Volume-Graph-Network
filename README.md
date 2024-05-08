@@ -5,12 +5,12 @@ Predicting unsteady incompressible fluid dynamics with finite volume informed ne
 Hi，This repository provides an implementation of graph neural networks based on the finite volume method, and it can be used for incompressible fluid simulation. We provide the detailed implementation process of the model and supply .py files for converting TFrecord dataset files and COMSOL simulation result files into a unified H5 dataset. The final prediction results of our model are visualized using Tecplot.
 MeshGraphNets code is modified from https://github.com/google-deepmind/deepmind-research/tree/master/meshgraphnets, which mad meshgraphnet can predict pressure field. We also add single edge encode method support.
 
-# Download dataset
-## CYLINDEFRFLOW datset
-Datasets can be downloaded using the script download_dataset.sh. It contains a metadata file describing the available fields and their shape, and tfrecord datasets for training, validation and test splits. Dataset names match the naming in the paper. This repo is only suit for incompressible dataset.
+# The latest improvement work of this repository
+Unsupervised-FVGN (Gen-FVGN)[[arxiv]](https://arxiv.org/abs/2405.04466)[[code]](https://github.com/Litianyu141/Gen-FVGN-steady)
+Compared to the current version of FVGN, Gen-FVGN implements a differentiable gradient reconstruction algorithm (WLSQ) and a complete finite volume method discretization process, allowing it to solve PDEs without pre-computed data.
 
-## HYBRIDFLOW dataset
-Datasets can be download from URL:(coming soon), and run COMSOL with instructions inside the zip files.
+# Download dataset
+Datasets can be downloaded using the script download_dataset.sh. It contains a metadata file describing the available fields and their shape, and tfrecord datasets for training, validation and test splits. Dataset names match the naming in the paper. This repo is only suit for incompressible dataset.
 
 # Convert dataset
 ## TFrecord
