@@ -86,7 +86,10 @@ set .state file pth in FVGN-src/main/rollout.py
 --model_dir=\path\to\xx.state
 --write_tec_index=0 # write first case results to tecplot file
 ~~~
-
+Then run
+~~~py
+python FVGN-src/main/rollout.py
+~~~
 
 # Project Instruction
 
