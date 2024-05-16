@@ -13,9 +13,9 @@ Compared to the current version of FVGN, Gen-FVGN implements a differentiable gr
 Datasets can be downloaded using the script download_dataset.sh. It contains a metadata file describing the available fields and their shape, and tfrecord datasets for training, validation and test splits. Dataset names match the naming in the paper. This repo is only suit for incompressible dataset.
 
 # Convert dataset
-## TFrecord
+## 1.TFrecord
 Set TF recorddataset path at FVGN-src/main/Extract_mesh/parse_tfrecord_refactor.py and run this .py file. It will convert TFrecord file to H5 file which support map-style dataset in Pytorch.
-## HYBRIDFLOW
+## 2.HYBRIDFLOW
 Set .mphtxt and data file path in FVGN-src/main/Extract_mesh/parse_comsol.py, and run this .py file. It will convert COMSOL results to H5 file.
 
 
@@ -26,27 +26,27 @@ conda env list
 ~~~
  to check if the environment has been successfully imported.
 
-## FVGN 
+## 1.FVGN 
 Here, we tested that versions above PyTorch 2.0 can successfully run the code in this repository. However, to achieve the fastest training efficiency, our tests have shown that PyTorch version 1.9 offers the quickest training speed. We strongly recommend using two GPUs to run the code in this repository. One GPU should be used for training, while the other GPU is used for real-time testing of the model state performance saved after each epoch. This approach allows obtaining the best model training results at the fastest speed.
 
-## MGN
+## 2.MGN
 For users with RTX 30\40\A100 series graphics cards, it would be advisable to install a specific version of TensorFlow via pip to run the MGN code in this repository successfully. This can be done as shown below:
-### 1.install tensorflow1.1x wheel index
+### 2.1.install tensorflow1.1x wheel index
 ~~~py
 pip install nvidia-pyindex
 ~~~
 
-### 2.install tensorflow1.1x-gpu version
+### 2.2.install tensorflow1.1x-gpu version
 ~~~py
 pip install nvidia-tensorflow
 ~~~
-### 3.install other module specified in requirements.txt
+### 2.3.install other module specified in requirements.txt
 For users with other types of graphics cards, you are able to use the environment specified in the original Meshgraphnets repository.
 
 # MGN Train&Test
 MGN by default uses bidirectional edges (undirected graph encoding method), while FVGN by default uses unidirectional edges (directed graph encoding method).
 you can modify such hyperparameters in all .sh files:
-~~~py
+~~~sh
 batch_size=2
 num_training_steps=10000000
 num_rollouts=100
@@ -61,7 +61,9 @@ sh MGN-src/main/run_model.py 2>&1 | tee training_log.txt
 ~~~
 
 # FVGN Train&Test
-~~~py
+## 1. Train
+set params FVGN-src/main/run_train.sh.
+~~~sh
 batch_size=16
 lr=0.001
 loss_cont=1
@@ -72,10 +74,19 @@ loss="direct_mean_loss"
 nn_act="SiLU"
 Noise_injection_factor=0.02
 ~~~
+Then run
 ~~~sh
 sh /home/doomduke2/FVGN-sub-Meshgraphnet/FVGN-src/main/run_train.sh 
 ~~~
 You can find more params instruction in FVGN-src/main/utils/get_param.py
+
+## 1. Test
+set .state file pth in FVGN-src/main/rollout.py 
+~~~py
+--model_dir=\path\to\xx.state
+--write_tec_index=0 # write first case results to tecplot file
+~~~
+
 
 # Project Instruction
 
@@ -137,7 +148,6 @@ You can find more params instruction in FVGN-src/main/utils/get_param.py
 │       └── run_train_slurm.sh
 ├── README.md
 ```
-
 
 # License
 Feel free to clone this repository and modify it! If it's of good use for you, give it a star and please cite our publications!

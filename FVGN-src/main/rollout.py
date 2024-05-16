@@ -649,8 +649,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--batch_size", type=int, default=1, help="test batch size at once forward"
     )
-    parser.add_argument("--split", type=str, default="naca2412")
-    parser.add_argument("--rollout_num", type=int, default=1)
+    parser.add_argument("--split", type=str, default="test")
+    parser.add_argument("--rollout_num", type=int, default=100)
     parser.add_argument(
         "--sample_index",
         nargs="*",
@@ -662,7 +662,7 @@ if __name__ == "__main__":
         "--write_tec_index",
         nargs="*",
         type=int,
-        default=None,
+        default=1,
         help="testing samples index",
     )
 
