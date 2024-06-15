@@ -224,15 +224,15 @@ class EncoderProcesserDecoder(nn.Module):
     def forward(self, graph, graph_node):
         # input graph has cell_attr as x, edge_attr as edge_attr, edge_neighbour_cell_index as edge_index
         graph = self.encoder(graph)
-        graph_last = copy_geometric_data(graph, has_changed_node_attr_to_cell_attr=True)
-        count = self.message_passing_num
+        # graph_last = copy_geometric_data(graph, has_changed_node_attr_to_cell_attr=True)
+        # count = self.message_passing_num
         for model in self.processer_list:
             graph = model(graph, graph_node)
-            """add skip connection"""
-            if count == int(self.message_passing_num / 2):
-                graph.x = graph.x + graph_last.x
-                graph.edge_attr = graph.edge_attr + graph_last.edge_attr
-            count -= 1
+            # """add skip connection"""
+            # if count == int(self.message_passing_num / 2):
+            #     graph.x = graph.x + graph_last.x
+            #     graph.edge_attr = graph.edge_attr + graph_last.edge_attr
+            # count -= 1
         cell_decoded_attr, edge_decoded_attr = self.decoder(graph=graph)
 
         return (cell_decoded_attr, edge_decoded_attr)
