@@ -460,8 +460,8 @@ def rollout(
     cumulative_squared_error_u = torch.sum(squared_error_uv[:, :, 0], dim=1)
     cumulative_squared_error_v = torch.sum(squared_error_uv[:, :, 1], dim=1)
 
-    denominator_u = torch.sum(predicted_cell_UV[:, :, 0] ** 2, dim=1)
-    denominator_v = torch.sum(predicted_cell_UV[:, :, 1] ** 2, dim=1)
+    denominator_u = torch.sum(targets_UVP_on_cell[:, :, 0] ** 2, dim=1)
+    denominator_v = torch.sum(targets_UVP_on_cell[:, :, 1] ** 2, dim=1)
 
     cumulative_rmse_u = (
         torch.cumsum(cumulative_squared_error_u / denominator_u, dim=0) / time_steps
@@ -474,8 +474,8 @@ def rollout(
     cumulative_squared_error_uv = torch.sum(squared_error_uv, dim=[1, 2])
     cumulative_squared_error_p = torch.sum(squared_error_p, dim=[1, 2])
 
-    denominator_uv = torch.sum(predicted_cell_UV[:, :, 0:2] ** 2, axis=[1, 2])
-    denominator_p = torch.sum(predicted_edge_UVP[:, :, 2:3] ** 2, axis=[1, 2])
+    denominator_uv = torch.sum(targets_UVP_on_cell[:, :, 0:2] ** 2, axis=[1, 2])
+    denominator_p = torch.sum(target_edge_UVP[:, :, 2:3] ** 2, axis=[1, 2])
 
     cumulative_rmse_uv = (
         torch.cumsum(cumulative_squared_error_uv / denominator_uv, axis=0) / time_steps
