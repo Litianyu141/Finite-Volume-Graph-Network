@@ -488,7 +488,7 @@ def extract_mesh_state(
     # print("After renumed data has node type:")
     # stastic_nodeface_type(node_type)
 
-    if "compressible" in solving_params["name"]:
+    if solving_params["name"] == "compressible":
         face_type = torch.from_numpy(face_type)
         Airfoil = torch.full(face_type.shape, NodeType.AIRFOIL).to(torch.int32)
         Interior = torch.full(face_type.shape, NodeType.NORMAL).to(torch.int32)

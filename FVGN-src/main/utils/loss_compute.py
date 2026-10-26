@@ -31,16 +31,32 @@ def compute_FVM_loss(
     predicted_delta_u=None,
     target_delta_u=None,
     loss_function=None,
+    loss_continuity=None,
 ):
+
+    # loss_continuity is the per-cell continuity residual from the Intergrator,
+    # it is only computed when params.loss_cont > 0
+    enable_continuity = params.loss_cont > 0
+    if enable_continuity and not torch.is_tensor(loss_continuity):
+        raise ValueError(
+            "params.loss_cont > 0 but no continuity residual was passed to compute_FVM_loss"
+        )
 
     if "global_mean" in params.loss:
         # face uv contiunity
-        try:
+        if enable_continuity:
             loss_continuity = global_mean_pool(
                 (loss_continuity) ** 2, graph_cell.batch.cuda()
             )
-        except:
-            loss_continuity = 0.0
+            loss_continuity = (
+                loss_continuity.sum(dim=-1, keepdim=True)
+                if params.loss == "global_mean_sum"
+                else loss_continuity.mean(dim=-1, keepdim=True)
+            )
+        else:
+            loss_continuity = torch.zeros(
+                (graph_cell.num_graphs, 1), device=predicted_delta_u.device
+            )
 
         # face uv flux loss
         loss_face_uv = global_mean_pool(
@@ -82,11 +98,13 @@ def compute_FVM_loss(
         )
 
     else:
-        # face uv contiunity
-        try:
-            loss_continuity = loss_function(loss_continuity)
-        except:
-            loss_continuity = 0.0
+        # face uv contiunity, the residual should be driven to zero
+        if enable_continuity:
+            loss_continuity = loss_function(
+                loss_continuity, torch.zeros_like(loss_continuity)
+            )
+        else:
+            loss_continuity = torch.zeros((), device=predicted_delta_u.device)
 
         # face uv flux loss
         loss_face_uv = loss_function(

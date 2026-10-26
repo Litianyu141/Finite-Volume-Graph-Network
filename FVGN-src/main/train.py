@@ -214,6 +214,7 @@ while True:
                     predicted_delta_u=predicted_delta_u,
                     target_delta_u=target_delta_u,
                     loss_function=loss_function,
+                    loss_continuity=loss_continuity,
                 )
             )
 
@@ -226,6 +227,7 @@ while True:
 
         if training_round > params.pre_statistics_times and (current_num_samples == 0):
             logger.log(f"loss_{params.loss}", loss.item(), training_round)
+            logger.log(f"loss_continuity", loss_continuity.mean().item(), training_round)
             logger.log(f"loss_mom", loss_mom.mean().item(), training_round)
             logger.log(f"loss_face_p", loss_face_p.mean().item(), training_round)
             logger.log(f"loss_face_uv", loss_face_uv.mean().item(), training_round)
@@ -234,6 +236,7 @@ while True:
             print(
                 f"{epoch:5}: training_round: {training_round:5}; "
                 f"{params.loss:15}: {loss.item():8.2f}; "
+                f"loss_cont: {loss_continuity.mean().item():8.5f}; "
                 f"loss_mom: {loss_mom.mean().item():8.5f}; "
                 f"loss_face_uv: {loss_face_uv.mean().item():8.5f}; "
                 f"loss_face_p: {loss_face_p.mean().item():8.5f}; "
