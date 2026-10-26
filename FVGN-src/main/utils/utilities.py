@@ -3,6 +3,11 @@ from torch_geometric.data import Data
 import enum
 
 
+def graph_keys(graph):
+    # Data.keys is a property in PyG < 2.4 and a method in PyG >= 2.4
+    return graph.keys() if callable(graph.keys) else graph.keys
+
+
 class NodeType(enum.IntEnum):
     NORMAL = 0
     OBSTACLE = 1
@@ -23,7 +28,7 @@ def decompose_and_trans_node_attr_to_cell_attr_graph(
     # TODO: make it more robust
     x, edge_index, edge_attr, global_attr = None, None, None, None
     if has_changed_node_attr_to_cell_attr:
-        for key in graph.keys:
+        for key in graph_keys(graph):
             if key == "x":
                 x = graph.x  # avoid exception
             elif key == "edge_index":
@@ -38,7 +43,7 @@ def decompose_and_trans_node_attr_to_cell_attr_graph(
                 pass
         return (x, edge_index, edge_attr, global_attr)
     else:
-        for key in graph.keys:
+        for key in graph_keys(graph):
             if key == "x":
                 x = graph.x  # avoid exception
             elif key == "edge_index":
